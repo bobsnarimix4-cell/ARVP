@@ -1,0 +1,26 @@
+{
+  "name": "ARV.P",
+  "short_name": "ARV.P",
+  "description": "Calculateur posologies ARV pédiatriques — Sénégal / OMS",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdfcfb",
+  "theme_color": "#0d2f7a",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

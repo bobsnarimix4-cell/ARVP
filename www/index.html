@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>ARV.P</title>
+  <meta name="description" content="Calculateur posologies ARV pédiatriques — Sénégal / OMS"/>
+  <meta name="theme-color" content="#0d2f7a"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="ARV.P"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+  <link rel="icon" type="image/png" href="icons/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+<div id="root">
+  <div class="bg" aria-hidden="true"></div>
+  <div id="app" role="main">
+    <div class="install-banner" id="installBanner" role="complementary" aria-label="Installation de l'application">
+      <div class="itext">Installer l'app sur votre téléphone pour l'utiliser hors ligne</div>
+      <button type="button" class="ibtn" id="installBtn">Installer</button>
+      <button type="button" class="idismiss" id="dismissBtn" aria-label="Fermer">✕</button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="navTabs">
+      <button type="button" class="nav-btn active" data-page="calc">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <span>Posologies</span>
+      </button>
+      <button type="button" class="nav-btn" data-page="suivi">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Suivi</span>
+      </button>
+      <button type="button" class="nav-btn" data-page="res">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Ressources</span>
+      </button>
+    </nav>
+
+    <div class="header">
+      <div class="header-top">
+        <div class="hicon">
+          <img src="icons/icon-192.png" alt="Logo PEC VIH">
+        </div>
+        <div class="header-titles">
+          <h1>ARV.P</h1>
+          <div class="subtitle" id="pageSubtitle">Posologies ARV selon le poids</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE CALCULATEUR -->
+    <div id="page-calc" class="page-content active">
+      <div class="disclaimer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Aide à la décision clinique. Vérifiez toujours les doses.</span>
+      </div>
+
+      <div class="card">
+        <label class="wlabel" for="poids">Poids de l'enfant</label>
+        <div class="wrow">
+          <input type="number" id="poids" class="winput" step="0.1" min="0" placeholder="0.0" inputmode="decimal" aria-label="Poids de l'enfant en kilogrammes"/>
+          <span class="ubadge">kg</span>
+        </div>
+        <div class="rbar" id="rbar" aria-hidden="true"></div>
+        <div class="rlabels"><span>3</span><span>6</span><span>10</span><span>14</span><span>20</span><span>25</span><span>30</span><span>100</span></div>
+        <div class="qtests">
+          <span class="sep">Tester :</span>
+          <button type="button" class="qbtn" data-kg="4">4 kg</button>
+          <button type="button" class="qbtn" data-kg="8">8 kg</button>
+          <button type="button" class="qbtn" data-kg="12">12 kg</button>
+          <button type="button" class="qbtn" data-kg="16">16 kg</button>
+          <button type="button" class="qbtn" data-kg="22">22 kg</button>
+          <button type="button" class="qbtn" data-kg="27">27 kg</button>
+          <button type="button" class="qbtn" data-kg="35">35 kg</button>
+        </div>
+      </div>
+      <div id="error" style="display:none" class="errmsg" role="alert" aria-live="assertive">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="errtxt"></span>
+      </div>
+      <div id="results" style="display:none" aria-live="polite" aria-label="Résultats des posologies"></div>
+    </div>
+
+    <!-- PAGE SUIVI -->
+    <div id="page-suivi" class="page-content">
+      <div id="results-suivi"></div>
+    </div>
+
+    <!-- PAGE RESSOURCE -->
+    <div id="page-res" class="page-content">
+      <div class="card" style='border-left:4px solid #1a4a96'><div class='slabel' style='color:#1a4a96;font-size:.9rem'>🚨 SIGNES D'APPEL DU VIH CHEZ L'ENFANT</div><div style='font-size:.78rem;color:#1a3a5c;margin-bottom:.8rem;line-height:1.4'>Rechercher systématiquement ces signes chez tout enfant suspecté ou confirmé VIH+ :</div><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Cassure de la courbe staturo-pondérale</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Mauvaise prise pondérale</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Mauvaise croissance staturale</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Signes neurologiques</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Microcéphalie acquise</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Dyspraxie bucco-lingale</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Infections</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Muguet étendu hors période néonatale</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Écoulement de l'oreille persistant</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Infections sévères répétées</li></ul></div>
+      <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #1a5a9a">
+        <div style="padding:1rem; padding-bottom:0">
+          <div class="slabel" style="color:#1a5a9a; font-size:.9rem">Algorithme du diagnostic — enfant de moins de 14 mois</div>
+        </div>
+        <infant-followup-flowchart></infant-followup-flowchart>
+      </div>
+      <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #b91c1c">
+        <div style="padding:1rem; padding-bottom:0">
+          <div class="slabel" style="color:#b91c1c; font-size:.9rem">Organigramme MVA — Prise en charge du VIH chez l'enfant</div>
+        </div>
+        <mva-pediatric-flowchart></mva-pediatric-flowchart>
+      </div>
+      <div id="results-res"></div>
+    </div>
+
+    <div class="footer">
+      <div class="fauth">Développé par Abdourahmane Bonaventure Gbétie &amp; Dr El Hadji Amadou Moctar Cissé — v5.1</div>
+    </div>
+  </div>
+</div>
+<script src="js/data.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/classification.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/mva-pediatric-flowchart.js"></script>
+<script src="js/infant-followup-flowchart.js"></script>
+</body>
+</html>

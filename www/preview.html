@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>ARV.P — Apercu</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<style>
+  .preview-badge{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#0d2f7a;color:#fff;padding:6px 18px;border-radius:20px;font-size:12px;font-weight:700;z-index:9999;box-shadow:0 4px 16px rgba(13,47,122,.3);font-family:DM Sans,sans-serif}
+  .toast-demo{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0e7a4e;color:#fff;padding:10px 20px;border-radius:25px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);font-family:DM Sans,sans-serif;animation:fadeIn .3s ease}
+  .phone-frame{width:375px;height:812px;border:8px solid #1a1a1a;border-radius:40px;overflow:hidden;margin:60px auto 20px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3),inset 0 0 0 2px #333}
+  .phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:150px;height:28px;background:#1a1a1a;border-bottom-left-radius:18px;border-bottom-right-radius:18px;z-index:10001}
+  #root{position:absolute;inset:0;overflow-y:scroll;overflow-x:hidden}
+  @media(max-width:500px){.phone-frame{width:100%;height:100vh;border:none;border-radius:0;margin:0}.phone-notch{display:none}.preview-badge{top:8px}}
+</style>
+</head>
+<body style="background:#1a1a2e;display:flex;align-items:center;justify-content:center;min-height:100vh">
+
+<div class="preview-badge">Apercu ARV.P</div>
+
+<div class="phone-frame">
+<div class="phone-notch"></div>
+<div id="root">
+  <div class="bg" aria-hidden="true"></div>
+  <div id="app" role="main" style="position:relative;z-index:1;max-width:600px;margin:0 auto;padding-top:max(2.5rem,env(safe-area-inset-top));padding-left:0.8rem;padding-right:0.8rem;padding-bottom:calc(100px + env(safe-area-inset-bottom));min-height:100vh">
+
+    <nav class="nav-tabs" id="navTabs">
+      <button type="button" class="nav-btn active" data-page="calc">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <span>Posologies</span>
+      </button>
+      <button type="button" class="nav-btn" data-page="suivi">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Suivi</span>
+      </button>
+      <button type="button" class="nav-btn" data-page="res">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Ressources</span>
+      </button>
+    </nav>
+
+    <div class="header">
+      <div class="header-top">
+        <div class="hicon">
+          <img src="icons/icon-192.png" alt="Logo">
+        </div>
+        <div class="header-titles">
+          <h1>ARV.P</h1>
+          <div class="subtitle" id="pageSubtitle">Posologies ARV selon le poids</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE CALC -->
+    <div id="page-calc" class="page-content active">
+      <div class="disclaimer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Aide a la decision clinique. Verifiez toujours les doses.</span>
+      </div>
+
+      <div class="card">
+        <label class="wlabel" for="poids">Poids de l'enfant</label>
+        <div class="wrow">
+          <input type="number" id="poids" class="winput" step="0.1" min="0" placeholder="0.0" inputmode="decimal"/>
+          <span class="ubadge">kg</span>
+        </div>
+        <div class="rbar" id="rbar" aria-hidden="true"></div>
+        <div class="rlabels"><span>3</span><span>6</span><span>10</span><span>14</span><span>20</span><span>25</span><span>30</span><span>100</span></div>
+        <div class="qtests">
+          <span class="sep">Tester :</span>
+          <button type="button" class="qbtn" data-kg="4">4 kg</button>
+          <button type="button" class="qbtn" data-kg="8">8 kg</button>
+          <button type="button" class="qbtn" data-kg="12">12 kg</button>
+          <button type="button" class="qbtn" data-kg="16">16 kg</button>
+          <button type="button" class="qbtn" data-kg="22">22 kg</button>
+          <button type="button" class="qbtn" data-kg="27">27 kg</button>
+          <button type="button" class="qbtn" data-kg="35">35 kg</button>
+        </div>
+      </div>
+      <div id="error" style="display:none" class="errmsg" role="alert"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="errtxt"></span></div>
+      <div id="results" style="display:none" aria-live="polite"></div>
+    </div>
+
+    <!-- PAGE SUIVI -->
+    <div id="page-suivi" class="page-content"><div id="results-suivi"></div></div>
+
+    <!-- PAGE RESSOURCES -->
+    <div id="page-res" class="page-content">
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:.7rem;border-left:4px solid #1a5a9a">
+        <div style="padding:1rem;padding-bottom:0"><div class="slabel" style="color:#1a5a9a;font-size:.9rem">Algorithme du diagnostic</div></div>
+        <infant-followup-flowchart></infant-followup-flowchart>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:.7rem;border-left:4px solid #b91c1c">
+        <div style="padding:1rem;padding-bottom:0"><div class="slabel" style="color:#b91c1c;font-size:.9rem">Organigramme MVA</div></div>
+        <mva-pediatric-flowchart></mva-pediatric-flowchart>
+      </div>
+      <div id="results-res"></div>
+    </div>
+
+    <div class="footer">
+      <div class="fauth">v5.1 — Developpe par Abdourahmane Bonaventure Gbetie &amp; Dr El Hadji Amadou Moctar Cisse</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast-demo" id="toastDemo" style="display:none">Application mise a jour</div>
+
+<script src="js/data.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/classification.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/mva-pediatric-flowchart.js"></script>
+<script src="js/infant-followup-flowchart.js"></script>
+<script>
+  setTimeout(function(){var t=document.getElementById('toastDemo');t.style.display='block';setTimeout(function(){t.style.transition='opacity .4s';t.style.opacity='0';setTimeout(function(){t.remove()},400)},3000)},1500);
+  setTimeout(function(){setWeight(12)},500);
+</script>
+</body>
+</html>

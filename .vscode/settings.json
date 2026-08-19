@@ -1,0 +1,10 @@
+{
+  "cSpell.enabled": true,
+  "cSpell.language": "fr,en",
+  "cSpell.configurationPath": "cspell.json",
+  "html.validate.styles": true,
+  "html.customData": [],
+  "files.associations": {
+    "*.html": "html"
+  }
+}

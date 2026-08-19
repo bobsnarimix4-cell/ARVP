@@ -1,0 +1,15 @@
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+scripts/node_modules/
+scripts/.last-build-hash
+KEY/
+app/debug/
+app/build/
