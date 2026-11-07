@@ -110,10 +110,12 @@ object UpdateManager {
     }
 
     private fun fetchUpdateInfo(context: Context): UpdateInfo? {
-        val conn = URL(UPDATE_URL).openConnection() as HttpURLConnection
+        val cacheBustUrl = if (UPDATE_URL.contains("?")) "$UPDATE_URL&t=${System.currentTimeMillis()}" else "$UPDATE_URL?t=${System.currentTimeMillis()}"
+        val conn = URL(cacheBustUrl).openConnection() as HttpURLConnection
         try {
-            conn.connectTimeout = 15000
-            conn.readTimeout = 15000
+            conn.connectTimeout = 10000
+            conn.readTimeout = 10000
+            conn.useCaches = false
             conn.setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate")
             conn.setRequestProperty("Pragma", "no-cache")
             conn.connect()
@@ -143,7 +145,11 @@ object UpdateManager {
                 .getLong(KEY_VERSION_CODE, 0)
 
             val assetVersion = CryptoManager.getAssetVersion(context)
-            Log.i(TAG, "Remote: v${info.version} code=${info.versionCode} | Local: lastCode=$lastCode | Asset: v$assetVersion")
+            Log.i(TAG, "Remote: v${info.version} code=${info.versionCode} | Local: lastCode=$lastCode | Asset: v$assetVersion | Disabled=$isRemoteDisabled")
+
+            if (isRemoteDisabled) {
+                return null
+            }
 
             if (assetVersion != null && CryptoManager.compareVersions(info.version, assetVersion) <= 0) {
                 Log.i(TAG, "Remote version (${info.version}) <= Asset version ($assetVersion). Clearing stale update file.")
