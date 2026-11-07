@@ -13,19 +13,66 @@ import javax.crypto.spec.SecretKeySpec
 object CryptoManager {
 
     private const val TAG = "CryptoManager"
-    // Key seed namespace matching the initial asset encryption scheme
     private const val NAMESPACE = "com.example.arvp"
     private const val SALT = "ARVP_SALT_2024_v1"
     private const val ALGO = "AES/CBC/PKCS5Padding"
     private const val ENC_FILE = "index.html.enc"
 
+    @Volatile
+    private var cachedKey: ByteArray? = null
+
     private fun deriveKey(): ByteArray {
+        val existing = cachedKey
+        if (existing != null) return existing
         val input = (NAMESPACE + SALT).toByteArray(Charsets.UTF_8)
-        return MessageDigest.getInstance("SHA-256").digest(input)
+        val key = MessageDigest.getInstance("SHA-256").digest(input)
+        cachedKey = key
+        return key
     }
 
     fun decrypt(context: Context): String? {
-        val content = readEncryptedContent(context) ?: return null
+        val internalFile = File(context.filesDir, ENC_FILE)
+        if (!internalFile.exists()) {
+            val assetRaw = readAssetRaw(context) ?: return null
+            return decryptRaw(assetRaw)
+        }
+
+        return try {
+            val internalRaw = internalFile.readText(Charsets.UTF_8)
+            val internalHtml = decryptRaw(internalRaw)
+            val assetRaw = readAssetRaw(context)
+            val assetHtml = if (assetRaw != null) decryptRaw(assetRaw) else null
+
+            val internalVersion = extractVersion(internalHtml)
+            val assetVersion = extractVersion(assetHtml)
+
+            Log.i(TAG, "Asset Version: $assetVersion | Internal Version: $internalVersion")
+
+            if (assetHtml != null && assetVersion != null && (internalVersion == null || compareVersions(assetVersion, internalVersion) >= 0)) {
+                Log.i(TAG, "Asset version ($assetVersion) >= Internal ($internalVersion). Purging internal file.")
+                internalFile.delete()
+                assetHtml
+            } else {
+                internalHtml ?: assetHtml
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Decryption failed: ${e.message}")
+            internalFile.delete()
+            val assetRaw = readAssetRaw(context) ?: return null
+            decryptRaw(assetRaw)
+        }
+    }
+
+    private fun readAssetRaw(context: Context): String? {
+        return try {
+            context.assets.open(ENC_FILE).bufferedReader(Charsets.UTF_8).use { it.readText() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to read asset: ${e.message}")
+            null
+        }
+    }
+
+    private fun decryptRaw(content: String): String? {
         return try {
             val json = JSONObject(content)
             val iv = Base64.decode(json.getString("iv"), Base64.NO_WRAP)
@@ -38,49 +85,15 @@ object CryptoManager {
             val decrypted = cipher.doFinal(data)
             String(decrypted, Charsets.UTF_8)
         } catch (e: Exception) {
-            Log.e(TAG, "Decryption failed: ${e.message}", e)
+            Log.e(TAG, "decryptRaw failed: ${e.message}")
             null
         }
-    }
-
-    private fun readEncryptedContent(context: Context): String? {
-        val assetContent = try {
-            context.assets.open(ENC_FILE).bufferedReader(Charsets.UTF_8).use { it.readText() }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to read asset: ${e.message}")
-            null
-        }
-
-        val internalFile = File(context.filesDir, ENC_FILE)
-        if (internalFile.exists()) {
-            try {
-                val internalContent = internalFile.readText(Charsets.UTF_8)
-                val internalVersion = extractVersion(decryptContent(internalContent))
-                val assetVersion = extractVersion(decryptContent(assetContent ?: ""))
-
-                Log.i(TAG, "Asset Version: $assetVersion | Internal Version: $internalVersion")
-
-                if (assetVersion != null && (internalVersion == null || compareVersions(assetVersion, internalVersion) >= 0)) {
-                    Log.i(TAG, "Asset version ($assetVersion) >= Internal ($internalVersion). Purging internal file.")
-                    internalFile.delete()
-                    return assetContent
-                }
-                return internalContent
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to read internal update: ${e.message}")
-                internalFile.delete()
-            }
-        }
-
-        return assetContent
     }
 
     fun getAssetVersion(context: Context): String? {
-        return try {
-            val content = context.assets.open(ENC_FILE).bufferedReader(Charsets.UTF_8).use { it.readText() }
-            val html = decryptContent(content)
-            extractVersion(html)
-        } catch (e: Exception) { null }
+        val raw = readAssetRaw(context) ?: return null
+        val html = decryptRaw(raw)
+        return extractVersion(html)
     }
 
     fun getInstalledVersion(context: Context): String? {
@@ -88,25 +101,11 @@ object CryptoManager {
         if (internalFile.exists()) {
             return try {
                 val content = internalFile.readText(Charsets.UTF_8)
-                val html = decryptContent(content)
+                val html = decryptRaw(content)
                 extractVersion(html)
             } catch (e: Exception) { null }
         }
-
         return getAssetVersion(context)
-    }
-
-    private fun decryptContent(content: String): String? {
-        return try {
-            val json = JSONObject(content)
-            val iv = Base64.decode(json.getString("iv"), Base64.NO_WRAP)
-            val data = Base64.decode(json.getString("data"), Base64.NO_WRAP)
-            val keySpec = SecretKeySpec(deriveKey(), "AES")
-            val ivSpec = IvParameterSpec(iv)
-            val cipher = Cipher.getInstance(ALGO)
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec)
-            String(cipher.doFinal(data), Charsets.UTF_8)
-        } catch (e: Exception) { null }
     }
 
     private fun extractVersion(html: String?): String? {

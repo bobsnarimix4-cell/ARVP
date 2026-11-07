@@ -46,12 +46,15 @@ class MainActivity : ComponentActivity() {
                 return@launch
             }
             val html = withContext(Dispatchers.IO) {
-                CryptoManager.decrypt(this@MainActivity)
+                val decrypted = CryptoManager.decrypt(this@MainActivity)
+                if (decrypted != null) {
+                    SecurityDetector.storeIntegrityHash(this@MainActivity, decrypted)
+                }
+                decrypted
             }
             val version = UpdateManager.lastAppliedVersion
             withContext(Dispatchers.Main) {
                 if (html != null) {
-                    SecurityDetector.storeIntegrityHash(this@MainActivity, html)
                     webView?.loadDataWithBaseURL(
                         "file:///android_asset/www/",
                         html,

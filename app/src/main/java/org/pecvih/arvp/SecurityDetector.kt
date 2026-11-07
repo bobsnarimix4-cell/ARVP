@@ -50,17 +50,7 @@ object SecurityDetector {
         for (p in paths) {
             if (File(p).exists()) return true
         }
-
-        return try {
-            val process = Runtime.getRuntime().exec(arrayOf("/system/xbin/which", "su"))
-            val reader = process.inputStream.bufferedReader()
-            val result = reader.readLine()
-            reader.close()
-            process.destroy()
-            result != null
-        } catch (e: Exception) {
-            false
-        }
+        return false
     }
 
     private fun isEmulator(): Boolean {
