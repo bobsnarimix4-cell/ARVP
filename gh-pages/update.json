@@ -1,10 +1,10 @@
 ﻿{
-    "version":  "5000.15",
-    "versionCode":  1794070245687,
-    "sha256":  "68fd6b13f7febf7dac13aa55d9b56f860aa44b820068ccbc52fe70383c352be7",
+    "version":  "5000.16",
+    "versionCode":  1794070705563,
+    "sha256":  "ec7abcc5c23e67a96b66389bfcfe51400e92c81da8c2c4dc8f5bbb911cdac13d",
     "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
     "minAppVersion":  "1.0",
     "appDisabled":  false,
-    "releaseDate":  "2026-11-07T16:50:45.687Z",
-    "releaseNotes":  "Mise a jour globale des ressources, du suivi biologique et des performances de demarrage."
+    "releaseDate":  "2026-11-07T16:58:25.563Z",
+    "releaseNotes":  "Ajustement taille de police (hexavalent) dans MVA et vaccination."
 }
