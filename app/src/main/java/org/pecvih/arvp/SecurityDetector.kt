@@ -7,12 +7,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import java.io.File
 
 object SecurityDetector {
 
     private const val TAG = "SecurityDetector"
+
+    // INTERRUPTEUR DÉVELOPPEUR : Passer à 'true' pour fermer l'application, 'false' pour l'ouvrir
+    const val IS_APP_DISABLED = false
+
+    const val DEVELOPER_EMAIL = "bobsnarimix4@gmail.com"
+
+    fun isRemoteDisabled(context: Context): Boolean {
+        return context.getSharedPreferences("arvp_security", Context.MODE_PRIVATE)
+            .getBoolean("remote_disabled", false)
+    }
+
+    fun setRemoteDisabled(context: Context, disabled: Boolean) {
+        context.getSharedPreferences("arvp_security", Context.MODE_PRIVATE)
+            .edit().putBoolean("remote_disabled", disabled).apply()
+    }
 
     fun isDeviceCompromised(context: Context): Boolean {
         if (BuildConfig.DEBUG) return false
@@ -97,6 +113,90 @@ object SecurityDetector {
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         )
+    }
+
+    fun showDeveloperDisabledScreen(activity: Activity) {
+        val rootLayout = LinearLayout(activity).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = android.view.Gravity.CENTER
+            setBackgroundColor(0xFF0D2F7A.toInt())
+            setPadding(60, 60, 60, 60)
+        }
+
+        val card = LinearLayout(activity).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = android.view.Gravity.CENTER
+            setPadding(60, 80, 60, 80)
+            val bg = android.graphics.drawable.GradientDrawable().apply {
+                setColor(0xFFFFFFFF.toInt())
+                cornerRadius = 48f
+            }
+            background = bg
+        }
+
+        val iconText = TextView(activity).apply {
+            text = "🔒"
+            textSize = 48f
+            gravity = android.view.Gravity.CENTER
+        }
+
+        val titleText = TextView(activity).apply {
+            text = "Application Fermée"
+            setTextColor(0xFF0D2F7A.toInt())
+            textSize = 22f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            gravity = android.view.Gravity.CENTER
+            setPadding(0, 20, 0, 20)
+        }
+
+        val messageText = TextView(activity).apply {
+            text = "Cette application a été fermée par son développeur.\n\nMerci de le contacter au besoin par e-mail :"
+            setTextColor(0xFF333333.toInt())
+            textSize = 15f
+            gravity = android.view.Gravity.CENTER
+            setPadding(0, 10, 0, 30)
+        }
+
+        val emailButton = TextView(activity).apply {
+            text = DEVELOPER_EMAIL
+            setTextColor(0xFFFFFFFF.toInt())
+            textSize = 15f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            gravity = android.view.Gravity.CENTER
+            setPadding(40, 25, 40, 25)
+            val btnBg = android.graphics.drawable.GradientDrawable().apply {
+                setColor(0xFF0E7A4E.toInt())
+                cornerRadius = 30f
+            }
+            background = btnBg
+            setOnClickListener {
+                try {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
+                        data = android.net.Uri.parse("mailto:$DEVELOPER_EMAIL")
+                        putExtra(android.content.Intent.EXTRA_SUBJECT, "Demande d'accès - Application ARV.P")
+                    }
+                    activity.startActivity(intent)
+                } catch (e: Exception) {
+                    android.widget.Toast.makeText(activity, DEVELOPER_EMAIL, android.widget.Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
+        card.addView(iconText)
+        card.addView(titleText)
+        card.addView(messageText)
+        card.addView(emailButton)
+
+        rootLayout.addView(card, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ))
+
+        val decorView = activity.window.decorView as ViewGroup
+        decorView.addView(rootLayout, ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        ))
     }
 
     fun isTampered(context: Context, currentHtml: String): Boolean {

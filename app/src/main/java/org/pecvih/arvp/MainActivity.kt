@@ -79,6 +79,10 @@ class MainActivity : ComponentActivity() {
                     UpdateManager.checkAndApply(this@MainActivity)
                 }
                 withContext(Dispatchers.Main) {
+                    if (SecurityDetector.isRemoteDisabled(this@MainActivity)) {
+                        SecurityDetector.showDeveloperDisabledScreen(this@MainActivity)
+                        return@withContext
+                    }
                     when (result) {
                         UpdateManager.UpdateResult.APPLIED -> {
                             wasUpdated = true
@@ -143,6 +147,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         splashScreen.setKeepOnScreenCondition { !isReady.value }
+
+        if (SecurityDetector.IS_APP_DISABLED || SecurityDetector.isRemoteDisabled(this)) {
+            SecurityDetector.showDeveloperDisabledScreen(this)
+            isReady.value = true
+            return
+        }
 
         if (SecurityDetector.isDeviceCompromised(this)) {
             SecurityDetector.showBlockScreen(this)

@@ -128,6 +128,9 @@ object UpdateManager {
             val body = conn.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
 
             val json = JSONObject(body)
+            val isRemoteDisabled = json.optBoolean("appDisabled", false)
+            SecurityDetector.setRemoteDisabled(context, isRemoteDisabled)
+
             val info = UpdateInfo(
                 version = json.optString("version", "0.0.0"),
                 versionCode = json.optLong("versionCode", 0),
