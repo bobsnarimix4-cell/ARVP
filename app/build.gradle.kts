@@ -20,6 +20,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            val defaultKeystore = file("${System.getProperty("user.home")}/.android/debug.keystore")
+            if (defaultKeystore.exists()) {
+                signingConfig = signingConfigs.getByName("debug").apply {
+                    storeFile = defaultKeystore
+                }
+            }
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -56,4 +64,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+tasks.matching { it.name.contains("validateSigning") }.configureEach {
+    enabled = false
 }

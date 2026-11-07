@@ -65,7 +65,7 @@ object UpdateManager {
             }
 
             val computedHash = MessageDigest.getInstance("SHA-256")
-                .digest(data.toByteArray(Charsets.UTF_8))
+                .digest(data)
                 .joinToString("") { "%02x".format(it) }
 
             Log.i(TAG, "Computed hash: $computedHash")
@@ -79,8 +79,8 @@ object UpdateManager {
             }
 
             val file = File(context.filesDir, UPDATE_FILE)
-            file.writeText(data, Charsets.UTF_8)
-            Log.i(TAG, "Written ${data.length} chars to ${file.absolutePath}")
+            file.writeBytes(data)
+            Log.i(TAG, "Written ${data.size} bytes to ${file.absolutePath}")
 
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit().putLong(KEY_VERSION_CODE, info.versionCode).apply()
@@ -139,7 +139,14 @@ object UpdateManager {
             val lastCode = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .getLong(KEY_VERSION_CODE, 0)
 
-            Log.i(TAG, "Remote: v${info.version} code=${info.versionCode} | Local: lastCode=$lastCode")
+            val assetVersion = CryptoManager.getAssetVersion(context)
+            Log.i(TAG, "Remote: v${info.version} code=${info.versionCode} | Local: lastCode=$lastCode | Asset: v$assetVersion")
+
+            if (assetVersion != null && CryptoManager.compareVersions(info.version, assetVersion) <= 0) {
+                Log.i(TAG, "Remote version (${info.version}) <= Asset version ($assetVersion). Clearing stale update file.")
+                clearUpdate(context)
+                return null
+            }
 
             if (info.versionCode <= lastCode) {
                 Log.i(TAG, "No update needed (remote=$lastCode <= local=$lastCode)")
@@ -157,7 +164,7 @@ object UpdateManager {
         }
     }
 
-    private fun downloadEncrypted(info: UpdateInfo): String? {
+    private fun downloadEncrypted(info: UpdateInfo): ByteArray? {
         val conn = URL(info.url).openConnection() as HttpURLConnection
         try {
             conn.connectTimeout = 30000
@@ -171,9 +178,9 @@ object UpdateManager {
                 return null
             }
 
-            val data = conn.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-            Log.i(TAG, "Downloaded ${data.length} chars from ${info.url}")
-            return data
+            val bytes = conn.inputStream.use { it.readBytes() }
+            Log.i(TAG, "Downloaded ${bytes.size} bytes from ${info.url}")
+            return bytes
         } catch (e: Exception) {
             lastError = "Download error: ${e.message}"
             Log.e(TAG, "downloadEncrypted failed: ${e.message}")

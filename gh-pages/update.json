@@ -1,9 +1,9 @@
-{
-  "version": "5000.13",
-  "versionCode": 1792763369056,
-  "sha256": "6671b4dcfb0139e46b79beae770031176a596e89dab71d8721f759f2ed6563c8",
-  "url": "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
-  "minAppVersion": "1.0",
-  "releaseDate": "2026-10-23T13:49:29.056Z",
-  "releaseNotes": "Mise à jour automatique des données cliniques et du contenu."
+﻿{
+    "version":  "5000.14",
+    "versionCode":  1794034723617,
+    "sha256":  "68fd6b13f7febf7dac13aa55d9b56f860aa44b820068ccbc52fe70383c352be7",
+    "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
+    "minAppVersion":  "1.0",
+    "releaseDate":  "2026-11-07T06:58:43.617Z",
+    "releaseNotes":  "Mise a jour des ressources et du suivi biologique"
 }

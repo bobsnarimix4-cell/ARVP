@@ -13,6 +13,7 @@ import javax.crypto.spec.SecretKeySpec
 object CryptoManager {
 
     private const val TAG = "CryptoManager"
+    // Key seed namespace matching the initial asset encryption scheme
     private const val NAMESPACE = "com.example.arvp"
     private const val SALT = "ARVP_SALT_2024_v1"
     private const val ALGO = "AES/CBC/PKCS5Padding"
@@ -43,22 +44,43 @@ object CryptoManager {
     }
 
     private fun readEncryptedContent(context: Context): String? {
-        val internalFile = File(context.filesDir, ENC_FILE)
-        if (internalFile.exists()) {
-            return try {
-                internalFile.readText(Charsets.UTF_8)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to read internal update: ${e.message}")
-                null
-            }
-        }
-
-        return try {
+        val assetContent = try {
             context.assets.open(ENC_FILE).bufferedReader(Charsets.UTF_8).use { it.readText() }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to read asset: ${e.message}")
             null
         }
+
+        val internalFile = File(context.filesDir, ENC_FILE)
+        if (internalFile.exists()) {
+            try {
+                val internalContent = internalFile.readText(Charsets.UTF_8)
+                val internalVersion = extractVersion(decryptContent(internalContent))
+                val assetVersion = extractVersion(decryptContent(assetContent ?: ""))
+
+                Log.i(TAG, "Asset Version: $assetVersion | Internal Version: $internalVersion")
+
+                if (assetVersion != null && (internalVersion == null || compareVersions(assetVersion, internalVersion) >= 0)) {
+                    Log.i(TAG, "Asset version ($assetVersion) >= Internal ($internalVersion). Purging internal file.")
+                    internalFile.delete()
+                    return assetContent
+                }
+                return internalContent
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to read internal update: ${e.message}")
+                internalFile.delete()
+            }
+        }
+
+        return assetContent
+    }
+
+    fun getAssetVersion(context: Context): String? {
+        return try {
+            val content = context.assets.open(ENC_FILE).bufferedReader(Charsets.UTF_8).use { it.readText() }
+            val html = decryptContent(content)
+            extractVersion(html)
+        } catch (e: Exception) { null }
     }
 
     fun getInstalledVersion(context: Context): String? {
@@ -71,11 +93,7 @@ object CryptoManager {
             } catch (e: Exception) { null }
         }
 
-        return try {
-            val content = context.assets.open(ENC_FILE).bufferedReader(Charsets.UTF_8).use { it.readText() }
-            val html = decryptContent(content)
-            extractVersion(html)
-        } catch (e: Exception) { null }
+        return getAssetVersion(context)
     }
 
     private fun decryptContent(content: String): String? {
@@ -95,6 +113,18 @@ object CryptoManager {
         if (html == null) return null
         val regex = Regex("""version:\s*["']([^"']+)["']""")
         return regex.find(html)?.groupValues?.get(1)
+    }
+
+    fun compareVersions(v1: String, v2: String): Int {
+        val parts1 = v1.split(".").mapNotNull { it.toIntOrNull() }
+        val parts2 = v2.split(".").mapNotNull { it.toIntOrNull() }
+        val maxLen = maxOf(parts1.size, parts2.size)
+        for (i in 0 until maxLen) {
+            val p1 = parts1.getOrElse(i) { 0 }
+            val p2 = parts2.getOrElse(i) { 0 }
+            if (p1 != p2) return p1.compareTo(p2)
+        }
+        return 0
     }
 
     fun hasInternalUpdate(context: Context): Boolean {

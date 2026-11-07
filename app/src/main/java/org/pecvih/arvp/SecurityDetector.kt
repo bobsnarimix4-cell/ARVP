@@ -3,8 +3,6 @@ package org.pecvih.arvp
 import android.app.Activity
 import android.content.Context
 import android.os.Build
-import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -101,20 +99,13 @@ object SecurityDetector {
         )
     }
 
-    fun isTampered(context: Context): Boolean {
+    fun isTampered(context: Context, currentHtml: String): Boolean {
         val prefs = context.getSharedPreferences("arvp_security", Context.MODE_PRIVATE)
         val storedHash = prefs.getString("assets_hash", null) ?: return false
 
         return try {
-            val files = arrayOf("css/styles.css", "js/data.js", "js/app.js", "js/classification.js", "js/render.js", "js/ui.js")
-            val sb = StringBuilder()
-            for (f in files) {
-                try {
-                    context.assets.open("www/$f").bufferedReader().use { sb.append(it.readText()) }
-                } catch (_: Exception) {}
-            }
             val currentHash = java.security.MessageDigest.getInstance("SHA-256")
-                .digest(sb.toString().toByteArray())
+                .digest(currentHtml.toByteArray(Charsets.UTF_8))
                 .joinToString("") { "%02x".format(it) }
             currentHash != storedHash
         } catch (e: Exception) {
@@ -124,7 +115,7 @@ object SecurityDetector {
 
     fun storeIntegrityHash(context: Context, html: String) {
         val hash = java.security.MessageDigest.getInstance("SHA-256")
-            .digest(html.toByteArray())
+            .digest(html.toByteArray(Charsets.UTF_8))
             .joinToString("") { "%02x".format(it) }
         context.getSharedPreferences("arvp_security", Context.MODE_PRIVATE)
             .edit().putString("assets_hash", hash).apply()

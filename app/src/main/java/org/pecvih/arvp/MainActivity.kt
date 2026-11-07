@@ -18,12 +18,15 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicBoolean
 import org.pecvih.arvp.ui.theme.ARVPédiatriqueTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +34,7 @@ class MainActivity : ComponentActivity() {
     private val isReady = mutableStateOf(false)
     private var webView: WebView? = null
     private var wasUpdated = false
-    private var updateCheckRunning = false
+    private val updateCheckRunning = AtomicBoolean(false)
 
     private fun loadContent() {
         lifecycleScope.launch {
@@ -40,23 +43,35 @@ class MainActivity : ComponentActivity() {
             }
             val version = UpdateManager.lastAppliedVersion
             withContext(Dispatchers.Main) {
-                webView?.loadDataWithBaseURL(
-                    "file:///android_asset/www/",
-                    html ?: "<html><body style='display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#0d2f7a;'><h2>Erreur de chargement</h2></body></html>",
-                    "text/html",
-                    "UTF-8",
-                    null
-                )
-                if (version.isNotEmpty()) {
+                if (html != null) {
+                    SecurityDetector.storeIntegrityHash(this@MainActivity, html)
+                    webView?.loadDataWithBaseURL(
+                        "file:///android_asset/www/",
+                        html,
+                        "text/html",
+                        "UTF-8",
+                        null
+                    )
+                } else {
+                    webView?.loadDataWithBaseURL(
+                        "file:///android_asset/www/",
+                        "<html><body style='display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#0d2f7a;'><h2>Erreur de chargement</h2></body></html>",
+                        "text/html",
+                        "UTF-8",
+                        null
+                    )
+                    isReady.value = true
+                }
+                if (version.isNotEmpty() && wasUpdated) {
                     webView?.evaluateJavascript(makeToastJS("Mise à jour appliquée — v$version", "#0e7a4e"), null)
+                    wasUpdated = false
                 }
             }
         }
     }
 
     private fun runUpdateCheck() {
-        if (updateCheckRunning) return
-        updateCheckRunning = true
+        if (!updateCheckRunning.compareAndSet(false, true)) return
         Log.i(TAG, "Starting update check...")
         lifecycleScope.launch {
             try {
@@ -66,6 +81,7 @@ class MainActivity : ComponentActivity() {
                 withContext(Dispatchers.Main) {
                     when (result) {
                         UpdateManager.UpdateResult.APPLIED -> {
+                            wasUpdated = true
                             Toast.makeText(
                                 this@MainActivity,
                                 "Mise à jour appliquée — v${UpdateManager.lastAppliedVersion}",
@@ -106,7 +122,7 @@ class MainActivity : ComponentActivity() {
             } catch (e: Exception) {
                 Log.e(TAG, "Update check crashed: ${e.message}", e)
             } finally {
-                updateCheckRunning = false
+                updateCheckRunning.set(false)
             }
         }
     }
@@ -135,69 +151,55 @@ class MainActivity : ComponentActivity() {
         }
 
         enableEdgeToEdge()
-        val html = CryptoManager.decrypt(this)
 
         setContent {
             ARVPédiatriqueTheme {
-                if (webView == null) {
-                    webView = WebView(this@MainActivity).apply {
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                        settings.allowFileAccess = true
-                        settings.cacheMode = WebSettings.LOAD_NO_CACHE
-                        settings.databaseEnabled = true
-                        clearCache(true)
-                        setBackgroundColor(android.graphics.Color.TRANSPARENT)
-
-                        webViewClient = object : WebViewClient() {
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                super.onPageFinished(view, url)
-                                if (wasUpdated) {
-                                    view?.evaluateJavascript(
-                                        makeToastJS("Application mise à jour — v${UpdateManager.lastAppliedVersion}", "#0e7a4e"),
-                                        null
-                                    )
-                                }
-                                isReady.value = true
-                            }
-                            override fun shouldOverrideUrlLoading(
-                                view: WebView?,
-                                request: WebResourceRequest?
-                            ) = false
-                        }
-                        webChromeClient = WebChromeClient()
-
-                        addJavascriptInterface(UpdateBridge(), "ARVPUpdate")
-
-                        if (html != null) {
-                            loadDataWithBaseURL(
-                                "file:///android_asset/www/",
-                                html,
-                                "text/html",
-                                "UTF-8",
-                                null
-                            )
-                            SecurityDetector.storeIntegrityHash(this@MainActivity, html)
-                        } else {
-                            loadDataWithBaseURL(
-                                "file:///android_asset/www/",
-                                "<html><body style='display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#0d2f7a;'><h2>Erreur de chargement</h2></body></html>",
-                                "text/html",
-                                "UTF-8",
-                                null
-                            )
-                            isReady.value = true
-                        }
-                    }
-                }
-                val wv = webView!!
-                BackHandler(enabled = wv.canGoBack()) {
-                    wv.goBack()
-                }
-                AndroidView(
-                    factory = { wv },
+                Surface(
+                    color = Color(0xFF0D2F7A),
                     modifier = Modifier.fillMaxSize()
-                )
+                ) {
+                    if (webView == null) {
+                        webView = WebView(this@MainActivity).apply {
+                            settings.javaScriptEnabled = true
+                            settings.domStorageEnabled = true
+                            settings.allowFileAccess = true
+                            settings.cacheMode = WebSettings.LOAD_NO_CACHE
+                            settings.databaseEnabled = true
+                            clearCache(true)
+                            setBackgroundColor(android.graphics.Color.parseColor("#0d2f7a"))
+
+                            webViewClient = object : WebViewClient() {
+                                override fun onPageFinished(view: WebView?, url: String?) {
+                                    super.onPageFinished(view, url)
+                                    if (wasUpdated) {
+                                        view?.evaluateJavascript(
+                                            makeToastJS("Application mise à jour — v${UpdateManager.lastAppliedVersion}", "#0e7a4e"),
+                                            null
+                                        )
+                                        wasUpdated = false
+                                    }
+                                    isReady.value = true
+                                }
+                                override fun shouldOverrideUrlLoading(
+                                    view: WebView?,
+                                    request: WebResourceRequest?
+                                ) = false
+                            }
+                            webChromeClient = WebChromeClient()
+
+                            addJavascriptInterface(UpdateBridge(), "ARVPUpdate")
+                        }
+                        loadContent()
+                    }
+                    val wv = webView!!
+                    BackHandler(enabled = wv.canGoBack()) {
+                        wv.goBack()
+                    }
+                    AndroidView(
+                        factory = { wv },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
 

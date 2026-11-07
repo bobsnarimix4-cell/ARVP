@@ -1,0 +1,1622 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>ARV.P</title>
+  <meta name="description" content="Calculateur posologies ARV pédiatriques — Sénégal / OMS"/>
+  <meta name="theme-color" content="#0d2f7a"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="ARV.P"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+  <link rel="icon" type="image/png" href="icons/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{font-family:'DM Sans',sans-serif;background:#fdfcfb;height:100%;overflow:hidden;color:#2c3e50;line-height:1.5}
+#root{position:fixed;inset:0;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:none;background:url(icons/ARV-P.png) center/cover no-repeat fixed}
+.bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.bg::before{
+  content:'';position:absolute;top:0;left:0;width:100%;height:100%;
+  background-color: transparent;
+  background-image: url(icons/ARV-P.png);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  opacity: 0.08;
+  filter: none;
+}
+#app{
+  position:relative;
+  z-index:1;
+  max-width:600px;
+  margin:0 auto;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-left: max(0.8rem, env(safe-area-inset-left));
+  padding-right: max(0.8rem, env(safe-area-inset-right));
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  min-height: 100vh;
+}
+
+.nav-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 0.4rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  position: sticky;
+  top: 1rem;
+  z-index: 100;
+}
+.nav-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.6rem 0.2rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  color: #546e7a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+.nav-btn span { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+.nav-btn svg { opacity: 0.7; }
+.nav-btn.active { background: #0d2f7a; color: #fff; box-shadow: 0 4px 12px rgba(13,47,122,0.2); }
+.nav-btn.active svg { opacity: 1; stroke-width: 2.5; }
+
+.page-content { display: none; animation: fadeIn 0.3s ease; }
+.page-content.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.header{background:rgba(255,255,255,0.75);border-radius:20px;padding:1.2rem 1rem;margin-bottom:1.5rem;border:1px solid rgba(255,255,255,0.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow: 0 8px 32px rgba(0,0,0,0.03)}
+.header-top{display:flex;flex-direction:row;align-items:center;text-align:left;gap:0.8rem;margin-bottom:0}
+.hicon{width:clamp(54px, 16vw, 68px);height:clamp(54px, 16vw, 68px);border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 20px rgba(13,47,122,0.15);overflow:hidden;background:#fff;padding:2px;border:1px solid rgba(13,47,122,0.1)}
+.hicon img{width:100%;height:100%;object-fit:contain;display:block}
+.header-titles{display:flex;flex-direction:column;gap:0.1rem;flex:1;min-width:0}
+h1{font-size:clamp(1.2rem, 4.5vw, 1.5rem);font-weight:850;color:#0d2f7a;letter-spacing:-0.03em;line-height:1.1;overflow-wrap:break-word}
+.subtitle{font-size:clamp(0.75rem, 3vw, 0.88rem);color:#546e7a;margin-left:0;font-weight:600;opacity:0.9;line-height:1.2;overflow-wrap:break-word}
+
+.disclaimer{
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(230, 81, 0, 0.05);
+  border: 1px solid rgba(230, 81, 0, 0.15);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1rem;
+  color: #e65100;
+  font-size: 0.72rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+.card{background:rgba(255,255,255,0.85);border-radius:18px;border:1px solid rgba(255,255,255,1);padding:1rem;margin-bottom:1rem;backdrop-filter:blur(10px);box-shadow: 0 8px 30px rgba(0,0,0,0.03)}
+.wlabel{font-size:0.7rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#546e7a;margin-bottom:0.6rem;display:block;opacity:0.9}
+.wrow{display:flex;align-items:center;gap:0.6rem}
+.winput{flex:1;height:48px;border:2px solid rgba(13,47,122,0.08);border-radius:12px;padding:0 1rem;font-size:1.1rem;font-family:'DM Mono',monospace;font-weight:600;color:#0d2f7a;background:rgba(255,255,255,0.9);outline:none;transition: all 0.2s ease}
+.winput:focus{border-color:#0d2f7a;background:#fff;box-shadow: 0 0 0 4px rgba(13,47,122,0.05)}
+.ubadge{font-family:'DM Mono',monospace;font-size:0.85rem;font-weight:600;color:#0d2f7a;background:#fff;border:2px solid rgba(13,47,122,0.08);border-radius:10px;padding:0.4rem 0.8rem;flex-shrink:0}
+.rbar{margin-top:0.6rem;display:flex;gap:2px;height:4px}
+.rseg{flex:1;border-radius:3px;background:rgba(26,79,150,.15);transition:background .2s}
+.rseg.active{background:#2176d2}
+.rlabels{display:flex;justify-content:space-between;margin-top:2px}
+.rlabels span{font-family:'DM Mono',monospace;font-size:0.55rem;color:rgba(13,47,122,0.6);font-weight:600}
+.qtests{display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.8rem;align-items:center}
+.qbtn{background:rgba(13,47,122,0.04);border:1px solid rgba(13,47,122,0.1);border-radius:8px;padding:0.4rem 0.6rem;font-family:'DM Mono',monospace;font-size:0.75rem;color:#0d2f7a;cursor:pointer;font-weight:600;transition: all 0.2s ease}
+.qbtn:hover{background:rgba(13,47,122,0.08);border-color:rgba(13,47,122,0.2)}
+.qbtn:active{transform: scale(0.96)}
+.sep{color:#90a4ae;font-size:0.75rem;font-weight:600;margin-right:0.2rem}
+.errmsg{background:rgba(255,220,220,.8);border:1px solid rgba(200,50,50,.3);color:#7a1212;border-radius:9px;padding:.7rem .9rem;font-size:.83rem;margin-bottom:.85rem;display:flex;align-items:center;gap:.45rem}
+.slabel{font-size:0.64rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:0.35rem;white-space:nowrap}
+.slabel::after{content:'';flex:1;height:1px;background:currentColor;opacity:0.1}
+.sbadge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:0.6rem;font-weight:800;border:1.5px solid;letter-spacing:0.04em;white-space:nowrap;vertical-align:middle}
+
+.dchip {
+  position: relative;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 18px;
+  padding: 1.1rem;
+  padding-right: 3.8rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: hidden;
+}
+.dchip-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+.dname {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #0d2f7a;
+  margin-bottom: 0.6rem;
+  line-height: 1.2;
+  word-wrap: break-word;
+  padding-right: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.disp-tag {
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  vertical-align: middle;
+  margin-left: 8px;
+  display: inline-block;
+  opacity: 0.9;
+}
+.dchip-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.4rem 0.2rem 0.1rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  margin-top: 0.2rem;
+}
+.dchip-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 8px;
+  padding: 0.2rem 0.5rem;
+}
+.dchip-badge .disp-tag { margin-left: 6px; }
+.dchip-mini-bottle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 55px;
+  width: auto;
+  z-index: 1;
+  opacity: 0.85;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+  pointer-events: none;
+  display: block !important;
+}
+.ddose { position: relative; z-index: 2; width: 100%; }
+.ddose-val{font-family:'DM Mono',monospace;font-size:0.88rem;font-weight:700;color:#0d2f7a}
+.ddose-tag{font-size:0.58rem;font-weight:600;color:#546e7a;background:rgba(0,0,0,0.04);border-radius:5px;padding:0.15rem 0.4rem}
+.ddose-heure{font-size:0.65rem;font-weight:600;color:#e65100;background:#fff3e0;border-radius:6px;padding:0.2rem 0.5rem}
+
+.ddose-ms{display:inline-flex;flex-direction:column;background:rgba(255,255,255,0.5);border-radius:12px;padding:0.4rem 0.5rem;min-width:3.2rem;border:1px solid rgba(0,0,0,0.03)}
+.ddose-lbl{font-size:0.58rem;font-weight:700;color:#546e7a;text-transform:uppercase;margin-bottom:0.3rem;text-align:center}
+.pill-label{font-family:'DM Mono',monospace;font-size:0.75rem;font-weight:700;color:#0d2f7a;text-align:center;margin-top:0.2rem}
+.pills-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:3px}
+
+.protocole-box{display:flex;align-items:flex-start;gap:0.6rem;background:rgba(255,255,255,0.4);border-radius:12px;padding:0.8rem 1rem;margin-top:0.5rem;border:1px solid rgba(0,0,0,0.02)}
+.protocole-lbl{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;padding:0.2rem 0.4rem;border-radius:4px;background:rgba(0,0,0,0.05);flex-shrink:0}
+.protocole-txt{font-size:0.82rem;font-weight:500;line-height:1.5;white-space:pre-line}
+.tbtn{width:100%;background:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,1);border-radius:18px;padding:1.1rem 1.4rem;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;color:#0d2f7a;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s;margin-bottom:.5rem;backdrop-filter:blur(10px);box-shadow: 0 4px 15px rgba(0,0,0,0.02)}
+.tbtn.active{background:rgba(255,255,255,0.95);color:#0d2f7a;box-shadow: 0 8px 25px rgba(0,0,0,0.05);border-radius:18px 18px 0 0;margin-bottom:0}
+.io-panel{max-height:0;overflow:hidden;transition:max-height .35s ease,opacity .25s ease,margin .25s ease;opacity:0;margin:0 .5rem .5rem;border-radius:0 0 14px 14px}
+.io-panel.open{max-height:2000px;opacity:1;margin:0 .5rem .6rem}
+.chevron{transition:transform .3s ease;flex-shrink:0}
+.chevron.open{transform:rotate(180deg)}
+.twrap{border-radius:8px;border:1px solid rgba(26,79,150,.2);overflow:hidden}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:0.75rem;border-radius:12px;overflow:hidden;border:1px solid rgba(13,47,122,0.08)}
+th{background:rgba(13,47,122,0.05);font-weight:700;font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;color:#0d2f7a;padding:0.6rem 0.8rem;text-align:left;border-bottom:1px solid rgba(13,47,122,0.08)}
+td{padding:0.6rem 0.8rem;border-bottom:1px solid rgba(13,47,122,0.04);color:#000}
+tr:last-child td{border-bottom:none}
+tr.hl td{background:rgba(13,47,122,0.08);font-weight:700;color:#000}
+.rlist{list-style:none}
+.ritem{padding:.4rem 0;border-bottom:1px solid rgba(26,79,150,.08);font-size:.8rem;color:#1a3a5c;display:flex;align-items:flex-start;gap:.45rem;line-height:1.42;overflow-wrap:break-word;word-break:break-word}
+.ritem:last-child{border-bottom:none}
+.rdot{width:5px;height:5px;border-radius:50%;background:#2176d2;margin-top:.4rem;flex-shrink:0}
+.install-banner{display:none;background:rgba(200,225,255,.88);border:1px solid rgba(26,79,150,.35);border-radius:11px;padding:.8rem .95rem;margin-bottom:.85rem;align-items:center;gap:.65rem}
+.install-banner.show{display:flex}
+.ibtn{background:#1a5ab8;color:#fff;border:none;border-radius:7px;padding:.45rem .9rem;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;flex-shrink:0}
+.itext{font-size:.78rem;color:#0d2a4a;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.idismiss{background:none;border:none;color:rgba(26,79,150,.5);font-size:1.1rem;cursor:pointer;padding:0 .2rem;flex-shrink:0}
+
+.footer{position:fixed;bottom:0;left:0;right:0;z-index:1000;text-align:center;padding:0.3rem 1rem;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,0.05);box-shadow:0 -4px 20px rgba(0,0,0,0.05);padding-bottom:max(0.3rem,env(safe-area-inset-bottom));transition:transform .3s ease,opacity .3s ease}
+.fsrc{font-size:0.58rem;color:#546e7a;margin-bottom:0.05rem;line-height:1.1;opacity:0.8}
+.fauth{font-size:0.6rem;color:#0d2f7a;font-weight:700;letter-spacing:0.01em;overflow-wrap:break-word;word-break:break-word}
+
+@media (max-width: 360px) {
+  .dchip { padding: 0.8rem; padding-right: 3rem; }
+  .dchip-mini-bottle { height: 42px; right: 8px; }
+  .dname { font-size: 0.82rem; }
+  .slabel { white-space: normal; font-size: 0.58rem; }
+  .ddose-val { font-size: 0.8rem; }
+  .card { padding: 0.8rem; }
+  .nav-btn { padding: 0.45rem 0.15rem; gap: 0.2rem; }
+  .nav-btn span { font-size: 0.55rem; }
+  .nav-btn svg { width: 17px; height: 17px; }
+  .qbtn { padding: 0.3rem 0.5rem; font-size: 0.7rem; }
+  table { font-size: 0.68rem; }
+  th { font-size: 0.58rem; padding: 0.5rem 0.6rem; }
+  td { font-size: 0.68rem; padding: 0.5rem 0.6rem; }
+  .ritem { font-size: 0.75rem; }
+  .disclaimer { font-size: 0.68rem; padding: 0.5rem 0.6rem; }
+  .fauth { font-size: 0.55rem; }
+  .ubadge { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+}
+
+@media (prefers-color-scheme: dark) {
+  body { background: #0a0a0a; color: #e0e0e0; }
+  #root { background: #0a0a0a url(icons/ARV-P.png) center/cover no-repeat fixed; }
+  .bg::before { background-color: #0a0a0a; }
+
+  .header, .card, .footer, .tbtn, .nav-tabs {
+    background: rgba(25, 25, 25, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  h1, .ddose-val, .pill-label, .fauth, .qbtn { color: #82b1ff; }
+  .subtitle, .wlabel, .fsrc, .ddose-lbl, .ddose-tag { color: #b0bec5; }
+
+  .hicon { background: #1e1e1e; border-color: rgba(255, 255, 255, 0.1); }
+
+  .winput {
+    background: rgba(40, 40, 40, 0.9);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+  .winput:focus { border-color: #82b1ff; box-shadow: 0 0 0 4px rgba(130, 177, 255, 0.15); }
+
+  .ubadge { background: #1e1e1e; border-color: rgba(255, 255, 255, 0.1); color: #82b1ff; }
+
+  .qbtn { background: rgba(130, 177, 255, 0.1); border-color: rgba(130, 177, 255, 0.2); }
+  .qbtn:hover { background: rgba(130, 177, 255, 0.2); }
+
+  .dchip { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.05); }
+  .ddose-ms, .protocole-box, .sbadge { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.05); }
+
+  .tbtn.active { background: rgba(40, 40, 40, 0.95); }
+
+  .ritem { color: #cfd8dc; border-bottom-color: rgba(255, 255, 255, 0.05); }
+  td { color: #e0e0e0; border-bottom-color: rgba(255, 255, 255, 0.05); }
+  th { background: rgba(130, 177, 255, 0.1); color: #82b1ff; border-bottom-color: rgba(255, 255, 255, 0.1); }
+  table { border-color: rgba(255, 255, 255, 0.1); }
+  tr.hl td { background: rgba(130, 177, 255, 0.15); color: #82b1ff; }
+}
+
+/* ===== Ressources : MVA (aide-mémoire) ===== */
+.mva-card{border-left:4px solid #b91c1c}
+.mva-intro{font-size:.78rem;color:#1a3a5c;margin-bottom:.8rem;line-height:1.45}
+.mva-block{background:rgba(255,255,255,0.55);border:1px solid rgba(0,0,0,0.04);border-radius:14px;padding:.8rem .9rem;margin-bottom:.7rem}
+.mva-block-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap;margin-bottom:.45rem}
+.mva-block-title{font-size:.85rem;font-weight:800;color:#0d2f7a}
+.mva-tag{font-size:.56rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;padding:2px 7px;border-radius:4px;white-space:nowrap}
+.mva-tag.red{background:#b91c1c}
+.mva-tag.orange{background:#e65100}
+.mva-tag.green{background:#2e7d32}
+.mva-tag.blue{background:#1a5ab8}
+.mva-text{font-size:.78rem;color:#1a3a5c;line-height:1.45}
+.mva-note{font-size:.72rem;color:#7a3a3a;background:rgba(185,28,28,0.06);border-radius:8px;padding:.45rem .6rem;margin-top:.5rem;line-height:1.4}
+.mva-q{font-size:.8rem;font-weight:800;color:#b91c1c;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.4rem}
+.mva-branch{display:flex;align-items:flex-start;gap:.5rem;font-size:.76rem;color:#1a3a5c;line-height:1.4;margin-bottom:.4rem}
+.mva-step{display:flex;align-items:flex-start;gap:.7rem;background:rgba(255,255,255,0.55);border:1px solid rgba(0,0,0,0.04);border-radius:14px;padding:.7rem .8rem;margin-bottom:.55rem}
+.mva-letter{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'DM Mono',monospace;font-weight:700;font-size:1.05rem;flex-shrink:0}
+.mva-step-title{font-size:.82rem;font-weight:800;color:#0d2f7a;margin-bottom:.15rem}
+.mva-step-title small{font-weight:600;color:#546e7a;font-size:.7rem}
+@media (prefers-color-scheme: dark){
+  .mva-intro,.mva-text,.mva-branch{color:#cfd8dc}
+  .mva-block,.mva-step{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.06)}
+  .mva-block-title,.mva-step-title{color:#82b1ff}
+  .mva-step-title small{color:#b0bec5}
+  .mva-note{color:#ffab91;background:rgba(185,28,28,0.18)}
+  .mva-q{color:#ff8a80}
+}
+
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="bg" aria-hidden="true"></div>
+  <div id="app" role="main">
+    <div class="install-banner" id="installBanner" role="complementary" aria-label="Installation de l'application">
+      <div class="itext">Installer l'app sur votre téléphone pour l'utiliser hors ligne</div>
+      <button type="button" class="ibtn" id="installBtn">Installer</button>
+      <button type="button" class="idismiss" id="dismissBtn" aria-label="Fermer">✕</button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="navTabs">
+      <button type="button" class="nav-btn active" data-page="calc">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <span>Posologies</span>
+      </button>
+      <button type="button" class="nav-btn" data-page="suivi">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Suivi</span>
+      </button>
+      <button type="button" class="nav-btn" data-page="res">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Ressources</span>
+      </button>
+    </nav>
+
+    <div class="header">
+      <div class="header-top">
+        <div class="hicon">
+          <img src="icons/icon-192.png" alt="Logo PEC VIH">
+        </div>
+        <div class="header-titles">
+          <h1>ARV.P</h1>
+          <div class="subtitle" id="pageSubtitle">Posologies ARV selon le poids</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE CALCULATEUR -->
+    <div id="page-calc" class="page-content active">
+      <div class="disclaimer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Aide à la décision clinique. Vérifiez toujours les doses.</span>
+      </div>
+
+      <div class="card">
+        <label class="wlabel" for="poids">Poids de l'enfant</label>
+        <div class="wrow">
+          <input type="number" id="poids" class="winput" step="0.1" min="0" placeholder="0.0" inputmode="decimal" aria-label="Poids de l'enfant en kilogrammes"/>
+          <span class="ubadge">kg</span>
+        </div>
+        <div class="rbar" id="rbar" aria-hidden="true"></div>
+        <div class="rlabels"><span>3</span><span>6</span><span>10</span><span>14</span><span>20</span><span>25</span><span>30</span><span>100</span></div>
+        <div class="qtests">
+          <span class="sep">Tester :</span>
+          <button type="button" class="qbtn" data-kg="4">4 kg</button>
+          <button type="button" class="qbtn" data-kg="8">8 kg</button>
+          <button type="button" class="qbtn" data-kg="12">12 kg</button>
+          <button type="button" class="qbtn" data-kg="16">16 kg</button>
+          <button type="button" class="qbtn" data-kg="22">22 kg</button>
+          <button type="button" class="qbtn" data-kg="27">27 kg</button>
+          <button type="button" class="qbtn" data-kg="35">35 kg</button>
+        </div>
+      </div>
+      <div id="error" style="display:none" class="errmsg" role="alert" aria-live="assertive">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="errtxt"></span>
+      </div>
+      <div id="results" style="display:none" aria-live="polite" aria-label="Résultats des posologies"></div>
+    </div>
+
+    <!-- PAGE SUIVI -->
+    <div id="page-suivi" class="page-content">
+      <div id="results-suivi"></div>
+    </div>
+
+    <!-- PAGE RESSOURCE -->
+    <div id="page-res" class="page-content">
+      <div class="card" style='border-left:4px solid #1a4a96'><div class='slabel' style='color:#1a4a96;font-size:.9rem'>🚨 SIGNES D'APPEL DU VIH CHEZ L'ENFANT</div><div style='font-size:.78rem;color:#1a3a5c;margin-bottom:.8rem;line-height:1.4'>Rechercher systématiquement ces signes chez tout enfant suspecté ou confirmé VIH+ :</div><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Cassure de la courbe staturo-pondérale</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Mauvaise prise pondérale</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Mauvaise croissance staturale</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Signes neurologiques</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Microcéphalie acquise</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Dyspraxie bucco-lingale</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Infections</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Muguet étendu hors période néonatale</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Écoulement de l'oreille persistant</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Infections sévères répétées</li></ul></div>
+      <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #1a5a9a">
+        <div style="padding:1rem; padding-bottom:0">
+          <div class="slabel" style="color:#1a5a9a; font-size:.9rem">Algorithme du diagnostic — enfant de moins de 14 mois</div>
+        </div>
+        <infant-followup-flowchart></infant-followup-flowchart>
+      </div>
+      <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #b91c1c">
+        <div style="padding:1rem; padding-bottom:0">
+          <div class="slabel" style="color:#b91c1c; font-size:.9rem">Organigramme MVA — Prise en charge du VIH chez l'enfant</div>
+        </div>
+        <mva-pediatric-flowchart></mva-pediatric-flowchart>
+      </div>
+
+      <!-- MVA : définition (aide-mémoire PEC_MVA) -->
+      <div class="card mva-card">
+        <div class="slabel" style="color:#b91c1c;font-size:.9rem">MVA — Définition</div>
+        <div class="mva-intro">Un enfant est à un stade avancé de la maladie à VIH (MVA) s’il répond à l’un des critères suivants :</div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">Enfant de moins de 5 ans</span><span class="mva-tag red">D’emblée MVA</span></div>
+          <div class="mva-text">Un enfant nouvellement dépisté est classé MVA quel que soit son stade clinique.</div>
+          <div class="mva-note"><b>NB :</b> les enfants de moins de 5 ans sous TAR depuis plus d’un an avec CV indétectable ne sont plus classés MVA.</div>
+        </div>
+        <div class="mva-block" style="margin-bottom:0">
+          <div class="mva-block-head"><span class="mva-block-title">Enfant de plus de 5 ans</span><span class="mva-tag orange">Un seul suffit</span></div>
+          <ul class="rlist">
+            <li class="ritem"><span class="rdot" style="background:#b91c1c"></span>Stades 3 ou 4</li>
+            <li class="ritem"><span class="rdot" style="background:#b91c1c"></span>Stade 1 ou 2 avec taux de CD4+ &lt; 200 /mm³</li>
+            <li class="ritem"><span class="rdot" style="background:#b91c1c"></span>Retour aux soins après une interruption thérapeutique</li>
+            <li class="ritem"><span class="rdot" style="background:#b91c1c"></span>Échec thérapeutique</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- MVA : conduite à tenir -->
+      <div class="card mva-card">
+        <div class="slabel" style="color:#b91c1c;font-size:.9rem">Conduite à tenir devant une MVA</div>
+        <div class="mva-block">
+          <div class="mva-q">Est-ce une MVA ?</div>
+          <div class="mva-branch"><span class="mva-tag blue">&lt; 5 ans</span><span>Toujours MVA (sauf TAR &gt; 1 an + CV indétectable)</span></div>
+          <div class="mva-branch"><span class="mva-tag blue">&gt; 5 ans</span><span>Stade 3 ou 4 · stade 1 ou 2 avec CD4 &lt; 200 /mm³ · retour aux soins après interruption · échec thérapeutique</span></div>
+          <div class="mva-branch" style="margin-bottom:0"><span class="mva-tag green">Non</span><span>Suivi habituel</span></div>
+        </div>
+        <div style="font-size:.75rem;font-weight:700;margin:.2rem 0 .5rem;color:#b91c1c;text-transform:uppercase">Si oui : S · T · O · P</div>
+        <div class="mva-step">
+          <div class="mva-letter" style="background:#1a5ab8">S</div>
+          <div><div class="mva-step-title">Dépister <small>(Screen)</small></div><div class="mva-text">CD4 · tuberculose (TB-LAM urinaire, Xpert) · cryptococcose (CrAg LFA) · malnutrition</div></div>
+        </div>
+        <div class="mva-step">
+          <div class="mva-letter" style="background:#b91c1c">T</div>
+          <div><div class="mva-step-title">Traiter <small>(Treat)</small></div><div class="mva-text">Traiter sans délai les affections opportunistes, selon le protocole national</div></div>
+        </div>
+        <div class="mva-step">
+          <div class="mva-letter" style="background:#2e7d32">O</div>
+          <div><div class="mva-step-title">Optimiser le TAR <small>(Optimize)</small></div><div class="mva-text">Charge virale · dépister l’échec thérapeutique · renforcer l’ETP · schéma TAR optimisé</div></div>
+        </div>
+        <div class="mva-step" style="margin-bottom:0">
+          <div class="mva-letter" style="background:#e65100">P</div>
+          <div><div class="mva-step-title">Prévenir <small>(Prevent)</small></div><div class="mva-text">TPT · cotrimoxazole · vaccination adaptée</div></div>
+        </div>
+      </div>
+
+      <!-- MVA : vaccination -->
+      <div class="card mva-card">
+        <div class="slabel" style="color:#b91c1c;font-size:.9rem">MVA et vaccination</div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">Vaccins inactivés (hexavalent)</span><span class="mva-tag green">Toujours</span></div>
+          <div class="mva-text">Indiqués même en cas de MVA.</div>
+        </div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">Vaccins vivants atténués (RR)</span><span class="mva-tag orange">Retarder</span></div>
+          <div class="mva-text">Rougeole-Rubéole : à administrer seulement après stabilisation clinique et CV indétectable. 2 doses à 6-12 mois d’intervalle.</div>
+        </div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">BCG</span><span class="mva-tag orange">Différer</span></div>
+          <div class="mva-text">Jusqu’à stabilisation clinique sous TAR + CV indétectable.</div>
+        </div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">Fièvre jaune</span><span class="mva-tag blue">Sous conditions</span></div>
+          <div class="mva-text">Possible après stabilisation clinique + CV indétectable.</div>
+        </div>
+        <div class="mva-block" style="margin-bottom:0">
+          <div class="mva-block-head"><span class="mva-block-title">HPV</span><span class="mva-tag blue">2 doses</span></div>
+          <div class="mva-text">Deux (2) doses espacées de 6 mois chez les filles âgées de 9 à 14 ans.</div>
+        </div>
+      </div>
+
+      <div id="results-res"></div>
+    </div>
+
+    <div class="footer">
+      <div class="fauth">Développé par Abdourahmane Bonaventure Gbétie &amp; Dr El Hadji Amadou Moctar Cissé — v5.1</div>
+    </div>
+  </div>
+</div>
+<script src="js/data.js"></script>
+<script src="js/validation.js"></script>
+<script src="js/classification.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/mva-pediatric-flowchart.js"></script>
+<script src="js/infant-followup-flowchart.js"></script>
+
+<script>
+/* Données cliniques — PEC VIH pédiatrique Sénégal / OMS */
+window.__ARVP = window.__ARVP || {};
+window.PEC_DATA = {
+  version: "5000.13", // Mise à jour complète — réorganisation ressources + effets secondaires filtrés
+  SI: {
+    a: { label: 'Formulation préférentielle', color: '#0d2f7a', bg: '#b8cef8', border: '#3a6ad4' },
+    b: { label: 'Formulation optionnelle 1', color: '#1a4aaa', bg: '#ccdaf8', border: '#5a88d8' },
+    c: { label: 'Formulation optionnelle 2', color: '#2e62c4', bg: '#dce7fb', border: '#7aa4e0' },
+    d: { label: 'Formulation optionnelle 3', color: '#4a7dd4', bg: '#eaf0fd', border: '#9abde8' },
+  },
+
+  ARV: [
+    {
+      nom: 'ABC + 3TC 120/60 mg',
+      img: 'icons/abct3tc120_60_bottle.png',
+      isDispersible: true,
+      tranches: [
+        { m: '1/2 cp', ms: 'b', s: '1/2 cp', ss: 'b' },
+        { m: '1/2 cp', ms: 'b', s: '1 cp', ss: 'b' },
+        { m: '1 cp', ms: 'a', s: '1 cp', ss: 'a' },
+        { m: '1 cp', ms: 'b', s: '1+1/2 cp', ss: 'b' },
+        { pu: '3 cp', schema: 'a', heure: 'matin' },
+        null,
+        null,
+      ],
+    },
+    {
+      nom: 'ABC + 3TC 600/300 mg',
+      img: 'icons/abc_3tc_600_300_bottle.png',
+      tranches: [null, null, null, null, null, { pu: '1 cp', schema: 'b', heure: 'matin' }, { pu: '1 cp', schema: 'd', heure: 'matin' }],
+    },
+    {
+      nom: 'DTG 10 mg dispersible',
+      img: 'icons/DTG-10_bottle.png',
+      isDispersible: true,
+      tranches: [
+        { pu: '1/2 cp', schema: 'b', heure: 'matin' },
+        { pu: '1+1/2 cp', schema: 'b', heure: 'matin' },
+        { pu: '2 cp', schema: 'a', heure: 'matin' },
+        { pu: '2+1/2 cp', schema: 'b', heure: 'matin' },
+        null,
+        null,
+        null,
+      ],
+    },
+    {
+      nom: 'DTG 50 mg',
+      img: 'icons/DTG-50_bottle.png',
+      tranches: [null, null, null, null, { pu: '1 cp', schema: 'a', heure: 'matin' }, { pu: '1 cp', schema: 'b', heure: 'matin' }, { pu: '1 cp', schema: 'd', heure: 'matin' }],
+    },
+    {
+      nom: 'pALD (ABC/3TC/DTG) 60/30/5',
+      img: 'icons/pald_bottle.png',
+      isDispersible: true,
+      tranches: [
+        null,
+        { pu: '3 cp', schema: 'a', heure: 'matin' },
+        { pu: '4 cp', schema: 'b', heure: 'matin' },
+        { pu: '5 cp', schema: 'a', heure: 'matin' },
+        { pu: '6 cp', schema: 'b', heure: 'matin' },
+        null,
+        null,
+      ],
+    },
+    {
+      nom: 'ALD (ABC/3TC/DTG) 600/300/50',
+      img: 'icons/ALD_bottle.png',
+      tranches: [null, null, null, null, null, { pu: '1 cp', schema: 'a', heure: 'matin' }, { pu: '1 cp', schema: 'c', heure: 'matin' }],
+    },
+    { nom: 'TAF', img: 'icons/TAF_bottle.png', tranches: [null, null, null, null, null, null, { pu: '1 cp', schema: 'a', heure: 'matin' }] },
+    { nom: 'TLD (TDF+3TC+DTG)', img: 'icons/TLD_bottle.png', tranches: [null, null, null, null, null, null, { pu: '1 cp', schema: 'b', heure: 'matin' }] },
+  ],
+
+  TR: [
+    { label: '3-5,9 kg', min: 3, max: 5.9 },
+    { label: '6-9,9 kg', min: 6, max: 9.9 },
+    { label: '10-13,9 kg', min: 10, max: 13.9 },
+    { label: '14-19,9 kg', min: 14, max: 19.9 },
+    { label: '20-24,9 kg', min: 20, max: 24.9 },
+    { label: '25-29,9 kg', min: 25, max: 29.9 },
+    { label: '>= 30 kg', min: 30, max: 200 },
+  ],
+
+  SCH: [
+    { pref: null, opts: ['ABC+3TC 120/60 mg : 1/2 cp matin + 1/2 cp soir\n+ DTG 10 mg : 1/2 cp (prise unique /j)'] },
+    { pref: 'pALD (ABC/3TC/DTG) 60/30/5 : 3 cp (prise unique /j)', opts: ['ABC+3TC 120/60 mg : 1/2 cp matin + 1 cp soir\n+ DTG 10 mg : 1+1/2 cp (prise unique /j)'] },
+    { pref: 'ABC+3TC 120/60 mg : 1 cp matin + 1 cp soir\n+ DTG 10 mg : 2 cp (prise unique /j)', opts: ['pALD (ABC/3TC/DTG) 60/30/5 : 4 cp (prise unique /j)'] },
+    { pref: 'pALD (ABC/3TC/DTG) 60/30/5 : 5 cp (prise unique /j)', opts: ['ABC+3TC 120/60 mg : 1 cp matin + 1+1/2 cp soir\n+ DTG 10 mg : 2+1/2 cp (prise unique /j)'] },
+    { pref: 'ABC+3TC 120/60 mg : 3 cp (prise unique /j)\n+ DTG 50 mg : 1 cp (prise unique /j)', opts: ['pALD (ABC/3TC/DTG) 60/30/5 : 6 cp (prise unique /j)'] },
+    { pref: 'ALD (ABC/3TC/DTG) 600/300/50 : 1 cp (prise unique /j)', opts: ['ABC+3TC 600/300 mg : 1 cp/j + DTG 50 mg : 1 cp/j'] },
+    { pref: 'TAF : 1 cp (prise unique /j)', opts: ['TLD (TDF+3TC+DTG) : 1 cp (prise unique /j)', 'ALD (ABC/3TC/DTG) 600/300/50 : 1 cp (prise unique /j)', 'ABC+3TC 600/300 mg : 1 cp/j + DTG 50 mg : 1 cp/j'] },
+  ],
+
+  EF_MOL: {
+    'ABC (Abacavir)': {
+      freq: ['Nausées, vomissements (début de traitement)', 'Céphalées, fatigue', 'Diarrhée légère'],
+      grave: ["Réaction d'hypersensibilité : fièvre, éruption, myalgies => ARRÊT IMMÉDIAT et DÉFINITIF (ne jamais réintroduire)", 'Acidose lactique (rare)'],
+      surv: ['Test HLA-B*5701 avant initiation si disponible', 'Surveiller J15, J30, M3', "Arrêt immédiat si signes d'hypersensibilité"],
+    },
+    '3TC (Lamivudine)': {
+      freq: ['Généralement bien toléré', 'Céphalées, fatigue modérée', 'Nausées légères'],
+      grave: ['Acidose lactique (très rare)', 'Hépatomégalie avec stéatose (rare)'],
+      surv: ['Transaminases si signes cliniques', 'NFS si anémie suspectée'],
+    },
+    'DTG (Dolutegravir)': {
+      freq: ['Insomnie, cauchemars, rêves intenses', 'Céphalées', 'Nausées modérées', 'Prise de poids : Effet métabolique documenté, à surveiller régulièrement sur les courbes de croissance de l\'enfant.'],
+      grave: ["Réaction d'hypersensibilité avec atteinte hépatique (rare)", 'Augmentation CPK — myopathie (rare)', 'Risque malformation tube neural si prise en début de grossesse => éviter au 1er trimestre'],
+      interact: [
+        'Cations polyvalents (Fer, Calcium, Magnésium, Aluminium) : Réduisent l\'absorption. Espacer de 2h avant ou 6h après.',
+        'Anticonvulsivants (Carbamazépine, Phénobarbital, Phénytoïne) : Diminuent l\'efficacité. Nécessite une double dose de DTG.',
+        'Rifampicine (Traitement TB) : Diminue fortement les taux. Impose une double dose de DTG (2 prises/j).'
+      ],
+      surv: ['Transaminases à M1, M3, M6', 'Glycémie (légère élévation possible)', 'CPK si douleurs musculaires'],
+    },
+    'TDF (Tenofovir DF)': {
+      freq: ['Nausées, flatulences (début)', 'Céphalées'],
+      grave: ['Néphrotoxicité : tubulopathie rénale => surveiller créatinine et phosphorémie', 'Déminéralisation osseuse (ostéopénie/ostéoporose) à long terme', 'Syndrome de Fanconi (rare)'],
+      surv: ['Créatinine + phosphorémie à M1, M3, M6 puis annuel', 'DFG si insuffisance rénale', 'Densité osseuse si symptômes'],
+    },
+    'TAF (Tenofovir AF)': {
+      freq: ['Nausées légères', 'Céphalées', 'Fatigue'],
+      grave: ['Acidose lactique (rare — classe INTI)', 'Toxicité rénale inférieure au TDF mais à surveiller'],
+      surv: ['Fonction rénale annuelle', 'Densité osseuse si signes cliniques'],
+    },
+    'LPV/r (Lopinavir/Ritonavir)': {
+      freq: ['Diarrhée, nausées, vomissements (fréquents)', 'Douleurs abdominales', 'Dyslipidémie'],
+      grave: ['Hépatotoxicité (transaminases élevées)', 'Troubles du rythme cardiaque (allongement QT)', 'Lipodystrophie', 'Hyperglycémie'],
+      surv: ['Transaminases M1, M3, M6', 'Bilan lipidique à M3, M6 puis annuel', 'Glycémie à jeun', 'ECG si symptômes cardiaques'],
+    },
+  },
+
+  ARV_MOL: {
+    'ABC + 3TC 120/60 mg': ['ABC (Abacavir)', '3TC (Lamivudine)'],
+    'ABC + 3TC 600/300 mg': ['ABC (Abacavir)', '3TC (Lamivudine)'],
+    'DTG 10 mg dispersible': ['DTG (Dolutegravir)'],
+    'DTG 50 mg': ['DTG (Dolutegravir)'],
+    'pALD (ABC/3TC/DTG) 60/30/5': ['ABC (Abacavir)', '3TC (Lamivudine)', 'DTG (Dolutegravir)'],
+    'ALD (ABC/3TC/DTG) 600/300/50': ['ABC (Abacavir)', '3TC (Lamivudine)', 'DTG (Dolutegravir)'],
+    TAF: ['TAF (Tenofovir AF)'],
+    'TLD (TDF+3TC+DTG)': ['TDF (Tenofovir DF)', '3TC (Lamivudine)', 'DTG (Dolutegravir)'],
+  },
+
+  PC: {
+    'ABC + 3TC 120/60 mg': '#f57c00', // Orange (Label)
+    'ABC + 3TC 600/300 mg': '#ff9800', // Jaune Orangé (Adulte)
+    'DTG 10 mg dispersible': '#1565c0', // Bleu
+    'DTG 50 mg': '#ffd600', // Jaune Vif (Label)
+    'pALD (ABC/3TC/DTG) 60/30/5': '#fdd835', // Jaune (Label)
+    'ALD (ABC/3TC/DTG) 600/300/50': '#9c27b0', // Violet (Label)
+    TAF: '#03a9f4', // Bleu Clair (Label TAF)
+    'TLD (TDF+3TC+DTG)': '#2e7d32', // Vert (Label TLD)
+  },
+
+  CTMX: [
+    { label: '< 5 kg ou < 6 mois', susp: '2.5 ml', simple: '---', fort: '---' },
+    { label: '5-14 kg ou 6 mois-5 ans', susp: '5 ml', simple: '1/2 cp', fort: '---' },
+    { label: '15-29 kg ou 6-14 ans', susp: '10 ml', simple: '1 cp', fort: '1/2 cp' },
+    { label: '+ de 30 kg ou > 15 ans', susp: '---', simple: '2 cp', fort: '1 cp' },
+  ],
+
+  INH: [
+    { p: '3-5,9 kg', d: '50 mg/j' },
+    { p: '6-9,9 kg', d: '100 mg/j' },
+    { p: '10-13,9 kg', d: '150 mg/j' },
+    { p: '14-19,9 kg', d: '200 mg/j' },
+    { p: '20-24,9 kg', d: '250 mg/j' },
+    { p: '>= 25 kg', d: '300 mg/j' },
+  ],
+
+  IO_LIST: [
+    {
+      nom: 'Cotrimoxazole',
+      couleur: '#0e7a4e',
+      bg: 'rgba(220,245,230,.85)',
+      border: '#0e7a4e',
+      desc: 'Prophylaxie systématique chez tout enfant VIH exposé ou infecté.',
+      details: ['Indications : CD4 bas, stade OMS 3 ou 4, ou tout enfant < 5 ans VIH+.', 'Arrêt possible si CD4 > 350 cel/mm³ stable sous TARV pendant 6 mois.', 'Surveiller allergie cutanée, cytopénie.'],
+      tableau: { label: 'Doses Cotrimoxazole', cols: ['Âge', 'Dose'], rowsKey: 'CTMX' },
+    },
+    {
+      nom: 'Fluconazole',
+      couleur: '#1a5a9a',
+      bg: 'rgba(215,230,250,.85)',
+      border: '#1a5aaa',
+      desc: 'Traitement et prévention secondaire de la cryptococcose méningée.',
+      details: ['Indication : méningite à Cryptococcus confirmée (Ag cryptococcique positif, culture LCR).', 'Induction : Amphotéricine B + Flucytosine 14 jours.', 'Consolidation : Fluconazole 400 mg/j × 8 semaines.', "Maintenance : Fluconazole 200 mg/j jusqu'à CD4 > 200 cel/mm³ stable 6 mois."],
+      tableau: null,
+    },
+    {
+      nom: 'Traitement Préventif Tuberculose (TPT)',
+      couleur: '#8a6000',
+      bg: 'rgba(255,245,210,.88)',
+      border: '#c8920a',
+      desc: "TPT = Traitement Préventif de la Tuberculose : administration d'Isoniazide (INH) pour prévenir la tuberculose chez les enfants VIH+.",
+      details: ["Se fait à l'enrôlement après exclusion d'une tuberculose active par TB-LAM, GeneXpert ou Radiographie thoracique.", 'Isoniazide (INH) : 10 mg/kg/j (max 300 mg/j) pendant 6 mois.', 'Ne pas débuter si tuberculose active confirmée.', 'Surveiller les symptômes TB à chaque consultation.', 'Surveiller les contacts TB dans le ménage.'],
+      tableau: { label: 'Doses INH préventif', cols: ['Poids', 'Dose'], rowsKey: 'INH', hiByWeight: true },
+    },
+    {
+      nom: 'Candidose buccale / œsophagienne',
+      couleur: '#6b21a8',
+      bg: 'rgba(240,225,255,.85)',
+      border: '#8b3ac8',
+      desc: "Infection fongique fréquente en cas d'immunodépression sévère.",
+      details: ['Traitement : Fluconazole 3-6 mg/kg/j × 7-14 jours (buccale) ou 14-21 jours (œsophagienne).', 'Alternative : Nystatine suspension orale pour les formes légères buccales.', 'Prévention secondaire si récidives fréquentes.', "Optimiser le TARV pour restaurer l'immunité."],
+      tableau: null,
+    },
+    {
+      nom: 'Diarrhée chronique',
+      couleur: '#a05000',
+      bg: 'rgba(255,235,210,.85)',
+      border: '#c07020',
+      desc: 'Diarrhée > 14 jours chez l\'enfant VIH : étiologies multiples à rechercher.',
+      details: ['Rechercher : Cryptosporidium, Microsporidium, CMV, Isospora, bactéries.', 'Examens : coproculture, examen parasitologique des selles, coloration de Ziehl.', 'Traitement étiologique si agent identifié.', 'Le cotrimoxazole couvre Isospora belli.', 'Réhydratation et support nutritionnel systématique.'],
+      tableau: null,
+    },
+    {
+      nom: 'Dermatoses',
+      couleur: '#5a7a00',
+      bg: 'rgba(230,245,205,.85)',
+      border: '#7a9a20',
+      desc: 'Manifestations cutanées fréquentes en cas de VIH pédiatrique non contrôlé.',
+      details: ['Prurigo stroph. : antihistaminiques, crèmes émollientes.', 'Molluscum contagiosum : cryothérapie, imiquimod si nombreux.', 'Zona : Acyclovir 80 mg/kg/j en 4 prises × 7-10 jours.', 'Gale : Benzoate de benzyle ou Perméthrine topique.', 'Amélioration attendue with restauration immunitaire sous TARV.'],
+      tableau: null,
+    },
+  ],
+};
+window.__ARVP.data = window.PEC_DATA;
+
+</script>
+<script>
+/* Validation — escapeHtml, compareVersions, isValidData */
+(function () {
+  function escapeHtml(str) {
+    if (typeof str !== 'string') return str;
+    return str.replace(/[&<>"']/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+    });
+  }
+
+  function compareVersions(v1, v2) {
+    var a = String(v1).split('.').map(function (s) { return parseInt(s, 10) || 0; });
+    var b = String(v2).split('.').map(function (s) { return parseInt(s, 10) || 0; });
+    for (var i = 0; i < Math.max(a.length, b.length); i++) {
+      if ((a[i] || 0) > (b[i] || 0)) return 1;
+      if ((b[i] || 0) > (a[i] || 0)) return -1;
+    }
+    return 0;
+  }
+
+  function isValidData(d) {
+    if (!d || typeof d !== 'object') return false;
+    var keys = ['TR', 'ARV', 'SCH', 'SI', 'EF_MOL', 'ARV_MOL', 'PC', 'CTMX', 'INH', 'IO_LIST'];
+    for (var i = 0; i < keys.length; i++) {
+      if (!d[keys[i]] || typeof d[keys[i]] !== 'object') return false;
+    }
+    return true;
+  }
+
+  window.escapeHtml = escapeHtml;
+  window.__ARVP.escapeHtml = escapeHtml;
+  window.__ARVP.compareVersions = compareVersions;
+  window.__ARVP.isValidData = isValidData;
+})();
+
+</script>
+<script>
+/* Classification — tranches, doses, utilitaires */
+(function () {
+  function tIdx(w) {
+    var TR = window.__ARVP.tranches;
+    for (var i = 0; i < TR.length; i++) {
+      if (w >= TR[i].min && w <= TR[i].max) return i;
+    }
+    return -1;
+  }
+
+  function inhIdx(w) {
+    return w < 6 ? 0 : w < 10 ? 1 : w < 14 ? 2 : w < 20 ? 3 : w < 25 ? 4 : 5;
+  }
+
+  function setWeight(v) {
+    document.getElementById('poids').value = v;
+    window.__ARVP.render();
+  }
+
+  function dk(hex) {
+    var r = parseInt(hex.slice(1, 3), 16);
+    var g = parseInt(hex.slice(3, 5), 16);
+    var b = parseInt(hex.slice(5, 7), 16);
+    return '#' + [Math.max(0, r - 50), Math.max(0, g - 50), Math.max(0, b - 50)]
+      .map(function (v) { return ('0' + v.toString(16)).slice(-2); }).join('');
+  }
+
+  function pDose(s) {
+    s = s.trim();
+    if (s === '1/2 cp') return { w: 0, h: true };
+    var m = s.match(/^(\d+)\+1\/2 cp$/);
+    if (m) return { w: parseInt(m[1], 10), h: true };
+    var m2 = s.match(/^(\d+) cp$/);
+    if (m2) return { w: parseInt(m2[1], 10), h: false };
+    return null;
+  }
+
+  window.setWeight = setWeight;
+  window.__ARVP.tIdx = tIdx;
+  window.__ARVP.inhIdx = inhIdx;
+  window.__ARVP.setWeight = setWeight;
+  window.__ARVP.dk = dk;
+  window.__ARVP.pDose = pDose;
+})();
+
+</script>
+<script>
+/* Render — pills SVG, badges, dose chips, tables, cards, pages */
+(function () {
+  var A = window.__ARVP;
+
+  function pillW(c) {
+    var d = A.dk(c);
+    return "<svg width='26' height='13' viewBox='0 0 26 13' style='display:inline-block;vertical-align:middle'><ellipse cx='13' cy='6.5' rx='12' ry='5.5' fill='" + c + "' stroke='" + d + "' stroke-width='1'/><line x1='13' y1='1.5' x2='13' y2='11.5' stroke='" + d + "' stroke-width='0.7' opacity='0.5'/></svg>";
+  }
+
+  function pillH(c) {
+    var d = A.dk(c);
+    return "<svg width='15' height='13' viewBox='0 0 15 13' style='display:inline-block;vertical-align:middle'><path d='M1,6.5 A12,5.5 0 0,1 13,1.2 L13,11.8 A12,5.5 0 0,1 1,6.5 Z' fill='" + c + "' stroke='" + d + "' stroke-width='1'/><line x1='13' y1='1.2' x2='13' y2='11.8' stroke='" + d + "' stroke-width='1.2'/></svg>";
+  }
+
+  function pills(ds, nom, isSpecial) {
+    var p = A.pDose(ds);
+    if (!p) return '';
+    var c = A.pc[nom] || '#bdbdbd';
+    var style = isSpecial ? " style='max-width:85px; justify-content:flex-start'" : '';
+    var h = "<span class='pills-row'" + style + ">";
+    for (var i = 0; i < p.w; i++) h += pillW(c);
+    if (p.h) h += pillH(c);
+    return h + '</span>';
+  }
+
+  function badge(s) {
+    var i = A.si[s];
+    return "<span class='sbadge' style='background:" + i.bg + ';border-color:' + i.border + ';color:' + i.color + "'>" + s.toUpperCase() + '</span>';
+  }
+
+  function doseChip(t, nom) {
+    if (!t) return '';
+    var escapeHtml = A.escapeHtml;
+    if (t.pu !== undefined) {
+      var ht = t.heure === 'matin' ? "<span class='ddose-heure' style='margin:0; width:fit-content'>\u2600\uFE0F matin</span>" : '';
+      var isPALD6 = (nom.indexOf('pALD') !== -1 && t.pu === '6 cp');
+      if (isPALD6) {
+        return "<div style='display:flex; align-items:center; flex-wrap:wrap; gap:8px'>" + pills(t.pu, nom, true) + "<span class='ddose-val'>" + escapeHtml(t.pu) + "</span><span class='ddose-tag'>prise unique /j</span>" + ht + "</div>";
+      }
+      return "<div style='display:flex; align-items:center; flex-wrap:wrap; gap:8px'>" + pills(t.pu, nom, false) + "<span class='ddose-val'>" + escapeHtml(t.pu) + "</span><span class='ddose-tag'>prise unique /j</span>" + ht + "</div>";
+    }
+    return "<div style='display:flex; flex-wrap:wrap; gap:12px; margin-top:5px'><div style='display:flex; align-items:center; gap:6px'><span style='font-size:0.6rem; color:#546e7a; font-weight:800; text-transform:uppercase'>\u2600\uFE0F Matin:</span>" + pills(t.m, nom) + "<span class='ddose-val'>" + escapeHtml(t.m) + "</span></div><div style='display:flex; align-items:center; gap:6px'><span style='font-size:0.6rem; color:#546e7a; font-weight:800; text-transform:uppercase'>\uD83C\uDF19 Soir:</span>" + pills(t.s, nom) + "<span class='ddose-val'>" + escapeHtml(t.s) + "</span></div></div>";
+  }
+
+  function chev(o) {
+    return "<svg class='chevron" + (o ? ' open' : '') + "' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>";
+  }
+
+  function grpBySchema(idx) {
+    var g = { a: [], b: [], c: [], d: [] };
+    A.arv.forEach(function (arv) {
+      var t = arv.tranches[idx];
+      if (!t) return;
+      var s = t.pu !== undefined ? t.schema : t.ms;
+      if (g[s] && !g[s].some(function (x) { return x.arv.nom === arv.nom; })) {
+        g[s].push({ arv: arv, t: t });
+      }
+    });
+    return g;
+  }
+
+  function genTable(type, w) {
+    var isINH = type === 'INH';
+    var isCTX = type === 'CTX';
+    if (!isINH && !isCTX) return '';
+    var rows = isINH ? A.inh : A.ctmx;
+    var cols = isINH
+      ? ['Poids', 'Dose']
+      : ['Tranche (Poids/\u00c2ge)', 'Sirop (200/40)', 'Cp Simple (400/80)', 'Cp Fort (800/160)'];
+    var title = isINH ? 'Doses INH pr\u00e9ventif' : 'Doses Cotrimoxazole (CTX)';
+    var hi = -1;
+    if (isINH && !isNaN(w)) {
+      hi = A.inhIdx(w);
+    } else if (!isINH && !isNaN(w)) {
+      if (w < 5) hi = 0;
+      else if (w < 15) hi = 1;
+      else if (w < 30) hi = 2;
+      else hi = 3;
+    }
+    var color = isINH ? '#5a4000' : '#0a5e3e';
+    var escapeHtml = A.escapeHtml;
+    var h = "<div style='font-size:.68rem;font-weight:700;color:" + color + ";text-transform:uppercase;letter-spacing:.05em;margin:.8rem 0 .35rem'>" + escapeHtml(title) + "</div>";
+    h += "<div class='twrap' style='overflow-x:auto'><table><thead><tr>";
+    cols.forEach(function (c) { h += '<th>' + escapeHtml(c) + '</th>'; });
+    h += '</tr></thead><tbody>';
+    rows.forEach(function (r, i) {
+      var isHl = hi !== -1 && i === hi;
+      if (isINH) {
+        h += "<tr class='" + (isHl ? 'hl' : '') + "'><td>" + escapeHtml(r.p) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.d) + '</td></tr>';
+      } else {
+        h += "<tr class='" + (isHl ? 'hl' : '') + "'><td>" + escapeHtml(r.label) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.susp) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.simple) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.fort) + '</td></tr>';
+      }
+    });
+    h += '</tbody></table></div>';
+    return h;
+  }
+
+  function renderProphylaxies(w) {
+    var rh = '';
+    rh += "<div class='card' style='border-left:4px solid #0e7a4e; background:rgba(232, 245, 233, 0.85)'><div class='slabel' style='color:#0e7a4e; font-size:.9rem'>\uD83E\uDE79 TRAITEMENTS PR\u00c9VENTIFS (Prophylaxies)</div>";
+    rh += "<div style='margin-bottom:1.5rem'><div style='display:flex; align-items:center; gap:8px; margin-bottom:8px'><span style='background:#0e7a4e; color:white; padding:4px 8px; border-radius:6px; font-weight:800; font-size:0.75rem'>INH</span><b style='color:#1a1a1a; font-size:0.85rem'>ISONIAZIDE (100 mg)</b></div><div style='font-size:.78rem; color:#2c2c2a; margin-left:5px; line-height:1.4'>Pr\u00e9vient la Tuberculose. \u00c0 donner pendant 6 mois (10mg/kg/j, max 300mg) apr\u00e8s exclusion TB active.</div>" + genTable('INH', w) + '</div>';
+    rh += "<hr style='border:0; border-top:1px dashed #0e7a4e; margin:1.5rem 0; opacity:0.2'>";
+    rh += "<div><div style='display:flex; align-items:center; gap:8px; margin-bottom:8px'><span style='background:#1a5ab8; color:white; padding:4px 8px; border-radius:6px; font-weight:800; font-size:0.75rem'>CTX</span><b style='color:#1a1a1a; font-size:0.85rem'>COTRIMOXAZOLE</b></div><div style='font-size:.78rem; color:#2c2c2a; margin-left:5px; line-height:1.4'>Pr\u00e9vient les infections opportunistes. Arr\u00eat si CV < 1000 copies sur 2 mesures cons\u00e9cutives.</div>" + genTable('CTX', w) + '</div></div>';
+    return rh;
+  }
+
+  function renderSuivi(w) {
+    var rh = '';
+    rh += "<div class='card' style='border-left:4px solid #1a4a96'><div class='slabel' style='color:#1a4a96;font-size:.9rem'>\uD83D\uDCC5 SUIVI CLINIQUE</div><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>P\u00e9riodicit\u00e9 :</div><ul class='rlist'><li class='ritem'><span class='rdot'></span>Mensuelle (voire toutes les deux semaines) \u00e0 l'initiation du traitement ou enfant instable.</li><li class='ritem'><span class='rdot'></span>Tous les 3 mois : enfant stable (sous TAR depuis au moins 6 mois).</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>\u00c9l\u00e9ments du suivi :</div><ul class='rlist'><li class='ritem'><span class='rdot'></span>Surveillance de la croissance par la mesure du poids et de la taille</li><li class='ritem'><span class='rdot'></span>Rechercher une toux persistante, un amaigrissement et une fi\u00e8vre</li><li class='ritem'><span class='rdot'></span>Rechercher des signes de gravit\u00e9 (PCIME)</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>\u00c9valuation de l'Observance :</div><ul class='rlist'><li class='ritem'><span class='rdot'></span>S'assurer de la prise r\u00e9guli\u00e8re des m\u00e9dicaments</li><li class='ritem'><span class='rdot'></span>R\u00e9adapter la posologie des ARV en fonction du poids de l'enfant</li></ul></div>";
+    rh += "<div class='card' style='border-left:4px solid #0d2f7a'><div class='slabel' style='color:#0d2f7a;font-size:.9rem'>\uD83D\uDD2C SUIVI BIOLOGIQUE</div><div style='font-size:.78rem;margin: .6rem 0'>P\u00e9riodicit\u00e9 : tous les six mois</div><div style='font-size:.75rem;font-weight:700;color:#0d2f7a;text-transform:uppercase;margin-top:.6rem'>El\u00e9ments de suivi</div><ul class='rlist'><li class='ritem'><span class='rdot'></span>Charge virale</li><li class='ritem'><span class='rdot'></span>Taux de CD4</li><li class='ritem'><span class='rdot'></span>Num\u00e9ration formule sanguine</li><li class='ritem'><span class='rdot'></span>Cr\u00e9atinin\u00e9mie</li><li class='ritem'><span class='rdot'></span>Transaminases h\u00e9patiques</li></ul></div>";
+    rh += "<div class='card' style='border-left:4px solid #b91c1c;background:#fff0f0'><div class='slabel' style='color:#b91c1c;font-size:.9rem'>CRIT\u00c8RES DEVANT CONDUIRE A UNE R\u00c9F\u00c9RENCE</div><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#b91c1c;text-transform:uppercase'>Crit\u00e8res cliniques</div><ul class='rlist'><li class='ritem' style='color:#7f1d1d'><span class='rdot' style='background:#ef4444'></span>Perte poids lors de deux visites cons\u00e9cutives </li><li class='ritem' style='color:#7f1d1d'><span class='rdot' style='background:#ef4444'></span>Signes de gravit\u00e9 PCIME</li><li class='ritem' style='color:#7f1d1d'><span class='rdot' style='background:#ef4444'></span>Enfant infect\u00e9 malgr\u00e9 la PTME</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.4rem;color:#b91c1c;text-transform:uppercase'>Crit\u00e8res biologiques :</div><ul class='rlist'><li class='ritem' style='color:#7f1d1d'><span class='rdot' style='background:#ef4444'></span>\u00c9chec virologique : une charge virale sup\u00e9rieure \u00e0 1000 copies apr\u00e8s deux mesures cons\u00e9cutives malgr\u00e9 un traitement bien conduit</li><li class='ritem' style='color:#7f1d1d'><span class='rdot' style='background:#ef4444'></span>Anomalie NFS, cr\u00e9atinin\u00e9mie et transaminases</li></ul></div>";
+    document.getElementById('results-suivi').innerHTML = rh;
+  }
+
+  function renderMols(prefix, filterNames) {
+    var escapeHtml = A.escapeHtml;
+    var keys = filterNames
+      ? Object.keys(A.efMol).filter(function (n) { return filterNames.indexOf(n) !== -1; })
+      : Object.keys(A.efMol);
+    if (keys.length === 0) return '';
+    var rh = '';
+    rh += "<div class='card' style='border-left:3px solid #a8c4e0; background:rgba(244,248,252,0.95); padding:0; overflow:hidden'>";
+    rh += "<div style='padding:.9rem 1rem .5rem'><div style='font-size:.82rem; font-weight:600; color:#5a7fa5; margin-bottom:.3rem'>Effets secondaires & interactions</div>";
+    rh += "<div style='font-size:.7rem; color:#7a8fa5; margin-bottom:.1rem'>Mol\u00e9cules actives sur cette tranche de poids</div></div>";
+    keys.forEach(function (molName) {
+      var data = A.efMol[molName];
+      var isOpen = A.openMols[prefix + molName] || false;
+      rh += "<div style='margin:0 .6rem .5rem; border-radius:10px; background:rgba(255,255,255,0.8); border:1px solid #dce6f0; overflow:hidden'>";
+      rh += "<button type='button' onclick='toggleMol(\"" + prefix + escapeHtml(molName).replace(/"/g, '&quot;') + "\")' style='width:100%; background:transparent; border:none; padding:.7rem .9rem; display:flex; justify-content:space-between; align-items:center; cursor:pointer'><span style='font-size:.78rem; font-weight:500; color:#5a7fa5; text-align:left'>" + escapeHtml(molName) + '</span>' + chev(isOpen) + '</button>';
+      if (isOpen) {
+        rh += "<div style='padding:0 .9rem .7rem; animation: fadeIn 0.25s ease'>";
+        if (data.freq && data.freq.length > 0) {
+          rh += "<div style='font-size:.65rem; font-weight:600; color:#6a8ab5; margin-bottom:.25rem; text-transform:uppercase'>Fr\u00e9quents :</div><ul class='rlist' style='margin-bottom:.5rem'>";
+          data.freq.forEach(function (f) { rh += "<li class='ritem'><span class='rdot' style='background:#94b8e0'></span>" + escapeHtml(f) + '</li>'; });
+          rh += '</ul>';
+        }
+        if (data.grave && data.grave.length > 0) {
+          rh += "<div style='font-size:.65rem; font-weight:600; color:#b45a5a; margin-bottom:.25rem; text-transform:uppercase'>Graves / Alerte :</div><ul class='rlist' style='margin-bottom:.5rem'>";
+          data.grave.forEach(function (g) { rh += "<li class='ritem'><span class='rdot' style='background:#d98a8a'></span><span style='color:#7a3a3a'>" + escapeHtml(g) + '</span></li>'; });
+          rh += '</ul>';
+        }
+        if (data.interact && data.interact.length > 0) {
+          rh += "<div style='font-size:.65rem; font-weight:600; color:#b87a3a; margin-bottom:.25rem; text-transform:uppercase'>Interactions :</div><div style='background:rgba(253,243,226,0.8); border:1px solid #f0d9b5; border-radius:8px; padding:.5rem; margin-bottom:.5rem'><ul class='rlist'>";
+          data.interact.forEach(function (i) { rh += "<li class='ritem' style='color:#9a6a2a'><span class='rdot' style='background:#d4a862'></span>" + escapeHtml(i) + '</li>'; });
+          rh += '</ul></div>';
+        }
+        if (data.surv && data.surv.length > 0) {
+          rh += "<div style='font-size:.65rem; font-weight:600; color:#5a8a6a; margin-bottom:.25rem; text-transform:uppercase'>Surveillance :</div><ul class='rlist'>";
+          data.surv.forEach(function (s) { rh += "<li class='ritem'><span class='rdot' style='background:#8ab89a'></span>" + escapeHtml(s) + '</li>'; });
+          rh += '</ul>';
+        }
+        rh += '</div>';
+      }
+      rh += '</div>';
+    });
+    rh += '</div>';
+    return rh;
+  }
+
+  function renderRes() {
+    var el = document.getElementById('results-res');
+    if (el) el.innerHTML = '';
+  }
+
+  function render() {
+    var raw = document.getElementById('poids').value;
+    var w = parseFloat(raw);
+    var err = document.getElementById('error');
+    var res = document.getElementById('results');
+    var escapeHtml = A.escapeHtml;
+    document.getElementById('rbar').innerHTML = A.tranches.map(function (t) {
+      return "<div class='rseg" + (!isNaN(w) && w >= t.min && w <= t.max ? ' active' : '') + "'></div>";
+    }).join('');
+    if (!raw || isNaN(w)) {
+      err.style.display = isNaN(w) && raw ? 'flex' : 'none';
+      res.style.display = 'none';
+      renderSuivi(NaN);
+      renderRes();
+      return;
+    }
+    var idx = A.tIdx(w);
+    if (idx === -1) {
+      err.style.display = 'flex';
+      document.getElementById('errtxt').textContent = 'Hors intervalle (3-200 kg).';
+      res.style.display = 'none';
+      renderSuivi(NaN);
+      renderRes();
+      return;
+    }
+    err.style.display = 'none';
+    res.style.display = 'block';
+    var T = A.tranches[idx];
+    var G = grpBySchema(idx);
+    var molNames = [];
+    ['a', 'b', 'c', 'd'].forEach(function (s) {
+      G[s].forEach(function (it) {
+        if (molNames.indexOf(it.arv.nom) === -1) molNames.push(it.arv.nom);
+      });
+    });
+    var O = [];
+    ['a', 'b', 'c', 'd'].forEach(function (s) {
+      var info = A.si[s];
+      var items = G[s];
+      if (!items || items.length === 0) return;
+      var h = "<div class='card' style='border-top:5px solid " + info.border + ';background:' + info.bg + "'>";
+      h += "<div class='slabel' style='color:" + info.color + "'>" + badge(s) + ' ' + escapeHtml(info.label) + ' \u2014 ' + escapeHtml(T.label) + '</div>';
+      var badgeList = [];
+      items.forEach(function (it) {
+        var molName = it.arv.nom;
+        var molImg = it.arv.img;
+        var bottleImg = molImg ? "<img class='dchip-mini-bottle' src='" + escapeHtml(molImg) + "' style='z-index:10' alt=''>" : '';
+        h += "<div class='dchip' style='border-color:" + info.border + "'><div class='dchip-content'><div class='dname' style='color:" + info.color + "'>" + escapeHtml(molName) + "</div><div class='ddose'>" + doseChip(it.t, molName) + "</div></div>" + bottleImg + '</div>';
+        badgeList.push("<span class='dchip-badge'><span style='color:" + info.color + ";font-weight:700'>" + escapeHtml(molName) + '</span> ' + "<span class='disp-tag' style='background:" + (it.arv.isDispersible ? info.color : '#607d8b') + "'>" + (it.arv.isDispersible ? 'Dispersible' : 'Non dispersible') + '</span></span>');
+      });
+      h += "<div class='dchip-badges'>" + badgeList.join('') + '</div>';
+      h += '</div>';
+      O.push(h);
+    });
+    O.push(renderProphylaxies(w));
+    O.push(renderMols('pos_', molNames));
+    res.innerHTML = O.join('');
+    renderSuivi(w);
+    renderRes();
+  }
+
+  window.toggleIO = function (nom) {
+    var safeId = nom.replace(/[^a-zA-Z0-9]/g, '_');
+    var el = document.getElementById('io-content-' + safeId);
+    var btn = document.getElementById('io-' + safeId);
+    if (!el) return;
+    var isOpen = el.classList.contains('open');
+    document.querySelectorAll('.io-panel.open').forEach(function (p) {
+      p.classList.remove('open');
+      var pid = p.id.replace('io-content-', '');
+      var b = document.getElementById('io-' + pid);
+      if (b) { b.classList.remove('active'); var c = b.querySelector('.chevron'); if (c) c.classList.remove('open'); }
+    });
+    document.querySelectorAll('.tbtn.active').forEach(function (b) {
+      b.classList.remove('active');
+      var c = b.querySelector('.chevron'); if (c) c.classList.remove('open');
+    });
+    if (!isOpen) {
+      el.classList.add('open');
+      if (btn) {
+        btn.classList.add('active');
+        var ch = btn.querySelector('.chevron');
+        if (ch) ch.classList.add('open');
+      }
+    }
+  };
+
+  A.render = render;
+  A.renderSuivi = renderSuivi;
+  A.renderRes = renderRes;
+})();
+
+</script>
+<script>
+(function () {
+  var A = window.__ARVP;
+  var D = A.data;
+  var escapeHtml = A.escapeHtml;
+  var compareVersions = A.compareVersions;
+  var isValidData = A.isValidData;
+
+  var savedData = localStorage.getItem('PEC_DATA_UPDATED');
+  if (savedData) {
+    try {
+      var parsed = JSON.parse(savedData);
+      if (isValidData(parsed) && compareVersions(parsed.version, D.version) > 0) {
+        window.__ARVP.data = parsed;
+        A.data = parsed;
+      }
+    } catch (e) {}
+  }
+
+  D = A.data;
+  A.si = D.SI;
+  A.arv = D.ARV;
+  A.tranches = D.TR;
+  A.sch = D.SCH;
+  A.efMol = D.EF_MOL;
+  A.arvMol = D.ARV_MOL;
+  A.pc = D.PC;
+  A.ctmx = D.CTMX;
+  A.inh = D.INH;
+  A.ioList = D.IO_LIST;
+
+  var currentPage = 'calc';
+  var openMols = {};
+  A.openMols = openMols;
+
+  var DATA_URL = 'https://gist.githubusercontent.com/bobsnarimix4-cell/76320890898a7a55cf3fd4e34445ac45/raw/data.json';
+
+  function checkRemoteUpdates() {
+    if (!navigator.onLine) return;
+    fetch(DATA_URL + '?t=' + Date.now()).then(function (res) { return res.text(); }).then(function (text) {
+      try {
+        var newData = JSON.parse(text);
+        if (isValidData(newData) && compareVersions(newData.version, D.version) > 0) {
+          localStorage.setItem('PEC_DATA_UPDATED', JSON.stringify(newData));
+          showUpdateToast();
+        }
+      } catch (e) {}
+    }).catch(function () {});
+  }
+
+  function showUpdateToast() {
+    var b = document.createElement('div');
+    b.style.cssText = 'position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:#0e7a4e;color:white;padding:.8rem 1.2rem;border-radius:12px;font-size:.85rem;font-weight:600;z-index:2000;display:flex;align-items:center;gap:.8rem;box-shadow:0 8px 24px rgba(0,0,0,0.2)';
+    b.innerHTML = '<span>\u2705 Mise \u00e0 jour disponible</span><button id="reloadBtn" style="background:white;color:#0e7a4e;border:none;padding:.4rem .8rem;border-radius:8px;font-weight:700;cursor:pointer">Appliquer</button>';
+    document.body.appendChild(b);
+    document.getElementById('reloadBtn').onclick = function () { location.reload(); };
+  }
+
+  window.toggleMol = function (k) {
+    openMols[k] = !openMols[k];
+    if (currentPage === 'calc') A.render();
+    else if (currentPage === 'res') A.renderRes();
+  };
+
+  window.switchPage = function (p) {
+    currentPage = p;
+    var subtitles = {
+      calc: 'Posologies ARV selon le poids',
+      suivi: 'Suivi clinique et biologique',
+      res: 'Ressources'
+    };
+    document.getElementById('pageSubtitle').textContent = subtitles[p] || '';
+    document.querySelectorAll('.page-content').forEach(function (x) { x.classList.remove('active'); });
+    document.querySelectorAll('.nav-btn').forEach(function (x) { x.classList.remove('active'); });
+    document.getElementById('page-' + p).classList.add('active');
+    document.querySelector('.nav-btn[data-page="' + p + '"]').classList.add('active');
+    if (p === 'suivi') A.renderSuivi(parseFloat(document.getElementById('poids').value));
+    if (p === 'res') A.renderRes();
+  };
+
+  document.getElementById('poids').addEventListener('input', A.render);
+  document.querySelectorAll('.nav-btn').forEach(function (b) {
+    b.addEventListener('click', function () { window.switchPage(b.getAttribute('data-page')); });
+  });
+  document.querySelectorAll('.qbtn[data-kg]').forEach(function (b) {
+    b.addEventListener('click', function () { A.setWeight(parseFloat(b.getAttribute('data-kg'))); });
+  });
+
+  A.renderRes();
+  A.renderSuivi(NaN);
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      var lastScrollTop = 0;
+      var footer = document.querySelector('.footer');
+      if (footer) {
+        window.addEventListener('scroll', function () {
+          var st = window.pageYOffset || document.documentElement.scrollTop;
+          if (st > lastScrollTop && st > 50) {
+            footer.style.transform = 'translateY(110%)';
+            footer.style.opacity = '0';
+          } else {
+            footer.style.transform = 'translateY(0)';
+            footer.style.opacity = '1';
+          }
+          lastScrollTop = st <= 0 ? 0 : st;
+        }, false);
+      }
+      navigator.serviceWorker.register('./sw.js');
+    });
+  }
+
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    var banner = document.getElementById('installBanner');
+    if (banner && !localStorage.getItem('INSTALL_DISMISSED')) { banner.classList.add('show'); }
+  });
+  var installBtn = document.getElementById('installBtn');
+  if (installBtn) {
+    installBtn.addEventListener('click', function () {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function () {
+          deferredPrompt = null;
+          var b = document.getElementById('installBanner');
+          if (b) b.classList.remove('show');
+        });
+      }
+    });
+  }
+  var dismissBtn = document.getElementById('dismissBtn');
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', function () {
+      localStorage.setItem('INSTALL_DISMISSED', '1');
+      var b = document.getElementById('installBanner');
+      if (b) b.classList.remove('show');
+    });
+  }
+
+  setTimeout(checkRemoteUpdates, 3000);
+})();
+
+</script>
+<script>
+/**
+ * <mva-pediatric-flowchart>
+ * Organigramme : Prise en charge du VIH chez l'enfant et stratégie MVA
+ */
+class MvaPediatricFlowchart extends HTMLElement {
+  connectedCallback() {
+    const root = this.attachShadow({ mode: 'open' });
+
+    const steps = [
+      { id: 'diagnostic', title: "VIH confirmé chez l'enfant", subtitle: 'Sérologie ou PCR positive' },
+      { id: 'age-moins-5', title: 'Enfant < 5 ans', subtitle: 'MVA automatique (OMS)' },
+      { id: 'age-plus-5', title: 'Enfant ≥ 5 ans', subtitle: 'CD4 + stade OMS + échec ARV' },
+      { id: 'mva', title: 'Maladie VIH avancée', subtitle: 'CD4<200 ou stade 3/4' },
+      { id: 'non-avance', title: 'VIH non avancé', subtitle: 'CD4≥200, stade 1-2' },
+      { id: 'bilan-mva', title: 'Bilan ciblé + prophylaxie', subtitle: 'TB-LAM, CrAg, cotrimoxazole' },
+      { id: 'arv-standard', title: 'ARV standard (Test&Treat)', subtitle: 'Stratégie TATARSEN' },
+      { id: 'arv-mva', title: 'ARV rapide + suivi IRIS', subtitle: 'Syndrome de reconstit. immune' },
+      { id: 'reevaluation-1an', title: 'Réévaluation à 1 an', subtitle: '<5 ans initialement MVA, CV indétectable' },
+      { id: 'suivi', title: 'Suivi au long cours', subtitle: 'CV, CD4, observance, transition ado' },
+    ];
+
+    root.innerHTML = `
+      <style>
+        :host {
+          --surface: #ffffff;
+          --border: #d8d6cd;
+          --text-primary: #2c2c2a;
+          --text-secondary: #5f5e5a;
+          --coral-fill: #FAECE7;
+          --coral-stroke: #D85A30;
+          --coral-title: #4A1B0C;
+          --coral-sub: #712B13;
+          --teal-fill: #E1F5EE;
+          --teal-stroke: #1D9E75;
+          --teal-title: #04342C;
+          --teal-sub: #085041;
+          --gray-fill: #F1EFE8;
+          --gray-stroke: #888780;
+          --gray-title: #2C2C2A;
+          --gray-sub: #444441;
+          display: block;
+          font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+          max-width: 100%;
+        }
+        @media (prefers-color-scheme: dark) {
+          :host {
+            --surface: #1c1c1a;
+            --border: #444441;
+            --text-primary: #f1efe8;
+            --text-secondary: #b4b2a9;
+            --coral-fill: #4A1B0C;
+            --coral-stroke: #F0997B;
+            --coral-title: #FAECE7;
+            --coral-sub: #F5C4B3;
+            --teal-fill: #04342C;
+            --teal-stroke: #5DCAA5;
+            --teal-title: #E1F5EE;
+            --teal-sub: #9FE1CB;
+            --gray-fill: #2C2C2A;
+            --gray-stroke: #888780;
+            --gray-title: #F1EFE8;
+            --gray-sub: #D3D1C7;
+          }
+        }
+        .wrap { background: var(--surface); border-radius: 12px; padding: 8px; }
+        svg { display: block; width: 100%; height: auto; }
+        .node { cursor: pointer; }
+        .node:hover rect { filter: brightness(0.96); }
+        .node text { pointer-events: none; }
+        .th { font-size: 14px; font-weight: 600; }
+        .ts { font-size: 12px; font-weight: 400; }
+        .arr { stroke: var(--text-secondary); stroke-width: 1.5; fill: none; }
+      </style>
+      <div class="wrap">
+        <svg viewBox="0 0 680 750" role="img" aria-label="Organigramme de prise en charge du VIH chez l'enfant, avec branche maladie VIH avancée">
+          <defs>
+            <marker id="arrow-mva" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+
+          <path d="M340,96 L340,123 L190,123 L190,150" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M340,96 L340,123 L490,123 L490,150" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M190,206 L190,260" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M490,206 L490,260" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M420,206 L420,233 L230,233 L230,260" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M190,316 L190,370" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M490,316 L490,370" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M190,426 L190,480" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M190,536 L190,570" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M190,626 L190,653 L290,653 L290,680" class="arr" marker-end="url(#arrow-mva)"/>
+          <path d="M490,426 L490,653 L390,653 L390,680" class="arr" marker-end="url(#arrow-mva)"/>
+
+          <g class="node" data-id="diagnostic" data-title="VIH confirmé chez l'enfant">
+            <rect x="190" y="40" width="300" height="56" rx="8" fill="var(--gray-fill)" stroke="var(--gray-stroke)" stroke-width="0.5"/>
+            <text class="th" x="340" y="60" text-anchor="middle" dominant-baseline="central" fill="var(--gray-title)">VIH confirmé chez l'enfant</text>
+            <text class="ts" x="340" y="80" text-anchor="middle" dominant-baseline="central" fill="var(--gray-sub)">Sérologie ou PCR positive</text>
+          </g>
+
+          <g class="node" data-id="age-moins-5" data-title="Enfant < 5 ans">
+            <rect x="60" y="150" width="260" height="56" rx="8" fill="var(--gray-fill)" stroke="var(--gray-stroke)" stroke-width="0.5"/>
+            <text class="th" x="190" y="170" text-anchor="middle" dominant-baseline="central" fill="var(--gray-title)">Enfant &lt; 5 ans</text>
+            <text class="ts" x="190" y="190" text-anchor="middle" dominant-baseline="central" fill="var(--gray-sub)">MVA automatique (OMS)</text>
+          </g>
+
+          <g class="node" data-id="age-plus-5" data-title="Enfant ≥ 5 ans">
+            <rect x="360" y="150" width="260" height="56" rx="8" fill="var(--gray-fill)" stroke="var(--gray-stroke)" stroke-width="0.5"/>
+            <text class="th" x="490" y="170" text-anchor="middle" dominant-baseline="central" fill="var(--gray-title)">Enfant ≥ 5 ans</text>
+            <text class="ts" x="490" y="190" text-anchor="middle" dominant-baseline="central" fill="var(--gray-sub)">CD4 + stade OMS + échec ARV</text>
+          </g>
+
+          <g class="node" data-id="mva" data-title="Maladie VIH avancée">
+            <rect x="60" y="260" width="260" height="56" rx="8" fill="var(--coral-fill)" stroke="var(--coral-stroke)" stroke-width="0.5"/>
+            <text class="th" x="190" y="280" text-anchor="middle" dominant-baseline="central" fill="var(--coral-title)">Maladie VIH avancée</text>
+            <text class="ts" x="190" y="300" text-anchor="middle" dominant-baseline="central" fill="var(--coral-sub)">CD4&lt;200 ou stade 3/4</text>
+          </g>
+
+          <g class="node" data-id="non-avance" data-title="VIH non avancé">
+            <rect x="360" y="260" width="260" height="56" rx="8" fill="var(--teal-fill)" stroke="var(--teal-stroke)" stroke-width="0.5"/>
+            <text class="th" x="490" y="280" text-anchor="middle" dominant-baseline="central" fill="var(--teal-title)">VIH non avancé</text>
+            <text class="ts" x="490" y="300" text-anchor="middle" dominant-baseline="central" fill="var(--teal-sub)">CD4≥200, stade 1-2</text>
+          </g>
+
+          <g class="node" data-id="bilan-mva" data-title="Bilan ciblé + prophylaxie">
+            <rect x="60" y="370" width="260" height="56" rx="8" fill="var(--coral-fill)" stroke="var(--coral-stroke)" stroke-width="0.5"/>
+            <text class="th" x="190" y="390" text-anchor="middle" dominant-baseline="central" fill="var(--coral-title)">Bilan ciblé + prophylaxie</text>
+            <text class="ts" x="190" y="410" text-anchor="middle" dominant-baseline="central" fill="var(--coral-sub)">TB-LAM, CrAg, cotrimoxazole</text>
+          </g>
+
+          <g class="node" data-id="arv-standard" data-title="ARV standard (Test&amp;Treat)">
+            <rect x="360" y="370" width="260" height="56" rx="8" fill="var(--teal-fill)" stroke="var(--teal-stroke)" stroke-width="0.5"/>
+            <text class="th" x="490" y="390" text-anchor="middle" dominant-baseline="central" fill="var(--teal-title)">ARV standard (Test&amp;Treat)</text>
+            <text class="ts" x="490" y="410" text-anchor="middle" dominant-baseline="central" fill="var(--teal-sub)">Stratégie TATARSEN</text>
+          </g>
+
+          <g class="node" data-id="arv-mva" data-title="ARV rapide + suivi IRIS">
+            <rect x="60" y="480" width="260" height="56" rx="8" fill="var(--coral-fill)" stroke="var(--coral-stroke)" stroke-width="0.5"/>
+            <text class="th" x="190" y="500" text-anchor="middle" dominant-baseline="central" fill="var(--coral-title)">ARV rapide + suivi IRIS</text>
+            <text class="ts" x="190" y="520" text-anchor="middle" dominant-baseline="central" fill="var(--coral-sub)">Syndrome de reconstit. immune</text>
+          </g>
+
+          <g class="node" data-id="reevaluation-1an" data-title="Réévaluation à 1 an">
+            <rect x="60" y="570" width="260" height="56" rx="8" fill="var(--teal-fill)" stroke="var(--teal-stroke)" stroke-width="0.5"/>
+            <text class="th" x="190" y="590" text-anchor="middle" dominant-baseline="central" fill="var(--teal-title)">Réévaluation à 1 an</text>
+            <text class="ts" x="190" y="610" text-anchor="middle" dominant-baseline="central" fill="var(--teal-sub)">&lt;5 ans initialement MVA, CV indétectable</text>
+          </g>
+
+          <g class="node" data-id="suivi" data-title="Suivi au long cours">
+            <rect x="170" y="680" width="340" height="56" rx="8" fill="var(--gray-fill)" stroke="var(--gray-stroke)" stroke-width="0.5"/>
+            <text class="th" x="340" y="700" text-anchor="middle" dominant-baseline="central" fill="var(--gray-title)">Suivi au long cours</text>
+            <text class="ts" x="340" y="720" text-anchor="middle" dominant-baseline="central" fill="var(--gray-sub)">CV, CD4, observance, transition ado</text>
+          </g>
+        </svg>
+      </div>
+    `;
+
+    root.querySelectorAll('.node').forEach((node) => {
+      node.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('step-click', {
+          detail: { id: node.dataset.id, title: node.dataset.title },
+          bubbles: true,
+          composed: true,
+        }));
+      });
+    });
+  }
+}
+
+customElements.define('mva-pediatric-flowchart', MvaPediatricFlowchart);
+
+</script>
+<script>
+class InfantFollowupFlowchart extends HTMLElement {
+  connectedCallback() {
+    const root = this.attachShadow({ mode: 'open' });
+
+    root.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+          max-width: 100%;
+          --pcr-bg: #fff;
+          --pcr-header-bg: #16A085;
+          --pcr-header-color: #fff;
+          --pcr-svg-bg: #fff;
+          --pcr-node-fill: #123A5E;
+          --pcr-node-action-fill: #B03A2E;
+          --pcr-node-followup-fill: #0E6B5C;
+          --pcr-label-fill: #fff;
+          --pcr-sublabel-fill: #d7e6f0;
+          --pcr-arrow-stroke: #123A5E;
+          --pcr-arrow-label-fill: #123A5E;
+        }
+        @media (prefers-color-scheme: dark) {
+          :host {
+            --pcr-bg: #1c1c1a;
+            --pcr-header-bg: #1a7a68;
+            --pcr-header-color: #fff;
+            --pcr-svg-bg: #242420;
+            --pcr-node-fill: #1a4a72;
+            --pcr-node-action-fill: #a03020;
+            --pcr-node-followup-fill: #0c5a4a;
+            --pcr-label-fill: #f0eee8;
+            --pcr-sublabel-fill: #c0d8e8;
+            --pcr-arrow-stroke: #90b8d8;
+            --pcr-arrow-label-fill: #90b8d8;
+          }
+        }
+        .pcr-algo-wrap {
+          background: var(--pcr-bg);
+          border-radius: 10px;
+          overflow: hidden;
+        }
+        .pcr-algo-svg-box {
+          background: var(--pcr-svg-bg);
+          border-radius: 10px;
+          padding: 8px;
+        }
+        svg { display: block; width: 100%; height: auto; }
+        .pcr-node-group { cursor: pointer; }
+        .pcr-node-group:hover rect { filter: brightness(1.12); }
+        .pcr-node-group rect { transition: filter 0.15s; }
+      </style>
+      <div class="pcr-algo-wrap">
+        <div class="pcr-algo-svg-box">
+          <svg viewBox="0 0 680 640" role="img" aria-label="Ordinogramme du diagnostic VIH pédiatrique">
+            <defs>
+              <marker id="pcr-arrowhead-inf" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M2 1L8 5L2 9" fill="none" stroke="var(--pcr-arrow-stroke)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </marker>
+            </defs>
+
+            <!-- R0 -->
+            <g class="pcr-node-group" data-node="expose">
+              <rect x="240" y="30" width="200" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="340" y="52" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Enfant exposé au VIH</text>
+            </g>
+            <line x1="340" y1="74" x2="340" y2="104" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+
+            <!-- R1 -->
+            <g class="pcr-node-group" data-node="pcr6">
+              <rect x="190" y="104" width="300" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="340" y="126" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Faire une PCR à 6 semaines</text>
+            </g>
+            <path d="M340 148 V162 H110 V178" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <path d="M340 148 V162 H340 V178" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <path d="M340 148 V162 H560 V178" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+
+            <!-- R2 -->
+            <g class="pcr-node-group" data-node="pcr1-pos">
+              <rect x="35" y="178" width="150" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="110" y="200" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">PCR1 positive</text>
+            </g>
+            <line x1="185" y1="200" x2="265" y2="200" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <g class="pcr-node-group" data-node="preleve-pcr2">
+              <rect x="265" y="178" width="150" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="340" y="200" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Prélever PCR2</text>
+            </g>
+            <g class="pcr-node-group" data-node="pcr1-neg">
+              <rect x="485" y="178" width="150" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="560" y="200" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">PCR1 négative</text>
+            </g>
+
+            <line x1="110" y1="222" x2="110" y2="252" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <path d="M340 222 V237 H265 V252" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <path d="M340 222 V237 H415 V252" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <line x1="560" y1="222" x2="560" y2="252" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+
+            <!-- R3 -->
+            <g class="pcr-node-group" data-node="tarv-immediat">
+              <rect x="25" y="252" width="170" height="56" rx="8" fill="var(--pcr-node-action-fill)"/>
+              <text x="110" y="272" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Débuter le TARV</text>
+              <text x="110" y="290" fill="var(--pcr-sublabel-fill)" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">immédiatement</text>
+            </g>
+            <g class="pcr-node-group" data-node="pcr2-pos">
+              <rect x="210" y="252" width="110" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="265" y="274" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">PCR2 positive</text>
+            </g>
+            <g class="pcr-node-group" data-node="pcr2-neg">
+              <rect x="360" y="252" width="110" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="415" y="274" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">PCR2 négative</text>
+            </g>
+            <g class="pcr-node-group" data-node="am-protege">
+              <rect x="475" y="252" width="170" height="56" rx="8" fill="var(--pcr-node-followup-fill)"/>
+              <text x="560" y="272" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">AM protégé</text>
+              <text x="560" y="290" fill="var(--pcr-sublabel-fill)" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">en cours</text>
+            </g>
+
+            <line x1="415" y1="296" x2="385" y2="326" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <line x1="560" y1="308" x2="550" y2="326" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+
+            <!-- R4 -->
+            <g class="pcr-node-group" data-node="pcr3-neg-1">
+              <rect x="330" y="326" width="110" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="385" y="348" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">PCR3 négative</text>
+            </g>
+            <g class="pcr-node-group" data-node="enfant-non-infecte">
+              <rect x="460" y="326" width="180" height="56" rx="8" fill="var(--pcr-node-followup-fill)"/>
+              <text x="550" y="346" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Enfant non infecté</text>
+              <text x="550" y="364" fill="var(--pcr-sublabel-fill)" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">Facteur de risque persistant</text>
+            </g>
+
+            <path d="M385 370 V385 H255 V400" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <line x1="385" y1="370" x2="385" y2="400" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <line x1="550" y1="382" x2="560" y2="400" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+
+            <!-- R5 -->
+            <g class="pcr-node-group" data-node="pcr3-pos">
+              <rect x="200" y="400" width="110" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="255" y="422" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">PCR3 positive</text>
+            </g>
+            <g class="pcr-node-group" data-node="pcr3-neg-2">
+              <rect x="330" y="400" width="110" height="44" rx="8" fill="var(--pcr-node-fill)"/>
+              <text x="385" y="422" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">PCR3 négative</text>
+            </g>
+            <g class="pcr-node-group" data-node="suivi-clinique">
+              <rect x="490" y="400" width="150" height="44" rx="8" fill="var(--pcr-node-followup-fill)"/>
+              <text x="565" y="422" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Suivi clinique</text>
+            </g>
+            <text x="463" y="392" fill="var(--pcr-arrow-label-fill)" font-size="12" font-weight="600" text-anchor="middle">Arrêt ARV</text>
+            <line x1="440" y1="422" x2="490" y2="422" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+
+            <!-- Convergence vers Enfant infecté -->
+            <path d="M265 296 V385 H175 V518" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <path d="M255 444 V480 H175 V518" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+            <line x1="565" y1="444" x2="545" y2="474" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+
+            <!-- R6 -->
+            <g class="pcr-node-group" data-node="enfant-infecte">
+              <rect x="100" y="518" width="150" height="44" rx="8" fill="var(--pcr-node-action-fill)"/>
+              <text x="175" y="540" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Enfant infecté</text>
+            </g>
+            <g class="pcr-node-group" data-node="allaitement-12">
+              <rect x="450" y="474" width="190" height="56" rx="8" fill="var(--pcr-node-followup-fill)"/>
+              <text x="545" y="494" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Allaitement 12 mois</text>
+              <text x="545" y="512" fill="var(--pcr-sublabel-fill)" font-size="12" font-weight="400" text-anchor="middle" dominant-baseline="central">Sérologie à 14 mois</text>
+            </g>
+
+            <line x1="175" y1="562" x2="175" y2="592" stroke="var(--pcr-arrow-stroke)" stroke-width="2" fill="none" marker-end="url(#pcr-arrowhead-inf)"/>
+
+            <!-- R7 -->
+            <g class="pcr-node-group" data-node="continuer-tarv">
+              <rect x="100" y="592" width="150" height="44" rx="8" fill="var(--pcr-node-action-fill)"/>
+              <text x="175" y="614" fill="var(--pcr-label-fill)" font-size="14" font-weight="600" text-anchor="middle" dominant-baseline="central">Continuer le TARV</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    `;
+
+    var details = {
+      expose: "Enfant né de mère vivant avec le VIH, considéré exposé jusqu'à confirmation du statut.",
+      pcr6: "PCR à ADN proviral réalisée à partir de 6 semaines de vie (ou à la première consultation après 6 semaines).",
+      "pcr1-pos": "Une PCR1 positive impose un traitement présomptif immédiat, en attendant la confirmation par PCR2.",
+      "preleve-pcr2": "Prélèvement de confirmation à réaliser au plus vite après un résultat PCR1 positif.",
+      "pcr1-neg": "PCR1 négative : poursuivre la surveillance tant que l'allaitement maternel expose l'enfant.",
+      "tarv-immediat": "Le TARV présomptif est débuté sans attendre la PCR2, vu le risque vital de retarder le traitement.",
+      "pcr2-pos": "Deux PCR positives (PCR1 + PCR2) confirment l'infection.",
+      "pcr2-neg": "Résultat discordant (PCR1+ / PCR2-) : une 3e PCR est nécessaire pour trancher.",
+      "am-protege": "Allaitement maternel protégé : mère sous ARV efficace, allaitement exclusif recommandé.",
+      "pcr3-neg-1": "PCR3 réalisée pour lever le doute créé par le résultat discordant PCR1+/PCR2-.",
+      "enfant-non-infecte": "Tant que l'allaitement se poursuit, le risque de transmission persiste : surveillance à maintenir.",
+      "pcr3-pos": "PCR3 positive : le diagnostic d'infection est confirmé, le TARV est poursuivi à vie.",
+      "pcr3-neg-2": "Deux PCR négatives sur trois (PCR2 et PCR3) permettent d'arrêter le TARV présomptif.",
+      "suivi-clinique": "Suivi clinique régulier, en particulier tant que l'allaitement maternel se poursuit.",
+      "enfant-infecte": "Diagnostic d'infection à VIH confirmé : prise en charge chronique à initier (bilan CD4, dépistage TB, etc.).",
+      "allaitement-12": "Sérologie VIH à réaliser à 14 mois (soit ~3 mois après la fin de l'allaitement), pour confirmer le statut sérologique final.",
+      "continuer-tarv": "TARV poursuivi à vie, sans fenêtre d'arrêt, avec transition progressive des schémas selon l'âge/poids."
+    };
+
+    root.querySelectorAll('.pcr-node-group').forEach((node) => {
+      node.addEventListener('click', () => {
+        var key = node.getAttribute('data-node');
+        var detail = details[key] || '';
+        this.dispatchEvent(new CustomEvent('step-click', {
+          detail: { id: key, title: key, text: detail },
+          bubbles: true,
+          composed: true,
+        }));
+      });
+    });
+  }
+}
+
+customElements.define('infant-followup-flowchart', InfantFollowupFlowchart);
+
+</script>
+</body>
+</html>
