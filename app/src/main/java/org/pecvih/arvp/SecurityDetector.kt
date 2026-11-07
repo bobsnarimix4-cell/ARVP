@@ -5,7 +5,6 @@ import android.content.Context
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -93,16 +92,7 @@ object SecurityDetector {
             ViewGroup.LayoutParams.MATCH_PARENT
         ))
 
-        val decorView = activity.window.decorView as ViewGroup
-        decorView.addView(blockView, ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        ))
-
-        activity.window.decorView.systemUiVisibility = (
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        )
+        activity.setContentView(blockView)
     }
 
     fun showDeveloperDisabledScreen(activity: Activity) {
@@ -182,11 +172,7 @@ object SecurityDetector {
             ViewGroup.LayoutParams.WRAP_CONTENT
         ))
 
-        val decorView = activity.window.decorView as ViewGroup
-        decorView.addView(rootLayout, ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        ))
+        activity.setContentView(rootLayout)
     }
 
     fun isTampered(context: Context, currentHtml: String): Boolean {

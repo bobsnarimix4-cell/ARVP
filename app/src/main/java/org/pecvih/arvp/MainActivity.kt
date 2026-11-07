@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
     private fun loadContent() {
         lifecycleScope.launch {
-            if (SecurityDetector.isRemoteDisabled(this@MainActivity)) {
+            if (SecurityDetector.IS_APP_DISABLED || SecurityDetector.isRemoteDisabled(this@MainActivity)) {
                 withContext(Dispatchers.Main) {
                     SecurityDetector.showDeveloperDisabledScreen(this@MainActivity)
                     isReady.value = true
