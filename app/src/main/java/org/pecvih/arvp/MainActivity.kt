@@ -173,7 +173,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ARVPédiatriqueTheme {
                 Surface(
-                    color = Color(0xFF0D2F7A),
+                    color = Color(0xFFFDFCFB),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     if (webView == null) {
@@ -184,7 +184,7 @@ class MainActivity : ComponentActivity() {
                             settings.cacheMode = WebSettings.LOAD_NO_CACHE
                             settings.databaseEnabled = true
                             clearCache(true)
-                            setBackgroundColor(android.graphics.Color.parseColor("#0d2f7a"))
+                            setBackgroundColor(android.graphics.Color.parseColor("#fdfcfb"))
 
                             webViewClient = object : WebViewClient() {
                                 override fun onPageFinished(view: WebView?, url: String?) {
