@@ -16,7 +16,7 @@ object SecurityDetector {
     private const val TAG = "SecurityDetector"
 
     // INTERRUPTEUR DÉVELOPPEUR : Passer à 'true' pour fermer l'application, 'false' pour l'ouvrir
-    const val IS_APP_DISABLED = false
+    const val IS_APP_DISABLED = true
 
     const val DEVELOPER_EMAIL = "bobsnarimix4@gmail.com"
 
