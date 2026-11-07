@@ -1,10 +1,10 @@
 ﻿{
-    "version":  "5000.14",
-    "versionCode":  1794034723617,
+    "version":  "5000.15",
+    "versionCode":  1794070245687,
     "sha256":  "68fd6b13f7febf7dac13aa55d9b56f860aa44b820068ccbc52fe70383c352be7",
     "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
     "minAppVersion":  "1.0",
-    "appDisabled":  true,
-    "releaseDate":  "2026-11-07T06:58:43.617Z",
-    "releaseNotes":  "Mise a jour des ressources et du suivi biologique"
+    "appDisabled":  false,
+    "releaseDate":  "2026-11-07T16:50:45.687Z",
+    "releaseNotes":  "Mise a jour globale des ressources, du suivi biologique et des performances de demarrage."
 }
