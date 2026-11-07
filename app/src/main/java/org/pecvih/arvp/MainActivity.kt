@@ -38,6 +38,13 @@ class MainActivity : ComponentActivity() {
 
     private fun loadContent() {
         lifecycleScope.launch {
+            if (SecurityDetector.isRemoteDisabled(this@MainActivity)) {
+                withContext(Dispatchers.Main) {
+                    SecurityDetector.showDeveloperDisabledScreen(this@MainActivity)
+                    isReady.value = true
+                }
+                return@launch
+            }
             val html = withContext(Dispatchers.IO) {
                 CryptoManager.decrypt(this@MainActivity)
             }
@@ -81,6 +88,7 @@ class MainActivity : ComponentActivity() {
                 withContext(Dispatchers.Main) {
                     if (SecurityDetector.isRemoteDisabled(this@MainActivity)) {
                         SecurityDetector.showDeveloperDisabledScreen(this@MainActivity)
+                        isReady.value = true
                         return@withContext
                     }
                     when (result) {
