@@ -1,10 +1,10 @@
 ﻿{
-    "version":  "5000.16",
-    "versionCode":  1794070705563,
+    "version":  "5000.17",
+    "versionCode":  1794166422154,
     "sha256":  "ec7abcc5c23e67a96b66389bfcfe51400e92c81da8c2c4dc8f5bbb911cdac13d",
     "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
     "minAppVersion":  "1.0",
     "appDisabled":  true,
-    "releaseDate":  "2026-11-07T16:58:25.563Z",
-    "releaseNotes":  "Ajustement taille de police (hexavalent) dans MVA et vaccination."
+    "releaseDate":  "2026-11-08T19:33:42.154Z",
+    "releaseNotes":  "Mise a jour v5000.17 - Integration complete du verrouillage developpeur, ajustement ressources et optimisation des performances"
 }
