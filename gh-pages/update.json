@@ -1,10 +1,10 @@
 ﻿{
-    "version":  "5000.17",
-    "versionCode":  1794166422154,
+    "version":  "5000.18",
+    "versionCode":  1794167595084,
     "sha256":  "ec7abcc5c23e67a96b66389bfcfe51400e92c81da8c2c4dc8f5bbb911cdac13d",
     "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
     "minAppVersion":  "1.0",
-    "appDisabled":  true,
-    "releaseDate":  "2026-11-08T19:33:42.154Z",
-    "releaseNotes":  "Mise a jour v5000.17 - Integration complete du verrouillage developpeur, ajustement ressources et optimisation des performances"
+    "appDisabled":  false,
+    "releaseDate":  "2026-11-08T19:53:15.084Z",
+    "releaseNotes":  "Reouverture officielle de l\u0027application."
 }
