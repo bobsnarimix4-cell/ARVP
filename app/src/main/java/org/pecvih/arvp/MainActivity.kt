@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
     private fun loadContent() {
         lifecycleScope.launch {
-            if (SecurityDetector.IS_APP_DISABLED || SecurityDetector.isRemoteDisabled(this@MainActivity)) {
+            if (SecurityDetector.isAppDisabled() || SecurityDetector.isRemoteDisabled(this@MainActivity)) {
                 withContext(Dispatchers.Main) {
                     SecurityDetector.showDeveloperDisabledScreen(this@MainActivity)
                     isReady.value = true
@@ -159,7 +159,7 @@ class MainActivity : ComponentActivity() {
 
         splashScreen.setKeepOnScreenCondition { !isReady.value }
 
-        if (SecurityDetector.IS_APP_DISABLED || SecurityDetector.isRemoteDisabled(this)) {
+        if (SecurityDetector.isAppDisabled() || SecurityDetector.isRemoteDisabled(this)) {
             SecurityDetector.showDeveloperDisabledScreen(this)
             isReady.value = true
             return
