@@ -22,6 +22,7 @@ const ASSETS = [
   './icons/DTG-50_bottle.png',
   './icons/abct3tc120_60_bottle.png',
   './icons/abc_3tc_600_300_bottle.png',
+  './icons/signes_appel_vih_pediatrique.png',
 ];
 
 self.addEventListener('install', (event) => {

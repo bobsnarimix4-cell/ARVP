@@ -410,12 +410,12 @@ tr.hl td{background:rgba(13,47,122,0.08);font-weight:700;color:#000}
 
     <!-- PAGE RESSOURCE -->
     <div id="page-res" class="page-content">
-      <div class="card" style='border-left:4px solid #1a4a96'><div class='slabel' style='color:#1a4a96;font-size:.9rem'>🚨 SIGNES D'APPEL DU VIH CHEZ L'ENFANT</div><div style='font-size:.78rem;color:#1a3a5c;margin-bottom:.8rem;line-height:1.4'>Rechercher systématiquement ces signes chez tout enfant suspecté ou confirmé VIH+ :</div><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Cassure de la courbe staturo-pondérale</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Mauvaise prise pondérale</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Mauvaise croissance staturale</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Signes neurologiques</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Microcéphalie acquise</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Dyspraxie bucco-lingale</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Infections</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Muguet étendu hors période néonatale</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Écoulement de l'oreille persistant</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Infections sévères répétées</li></ul></div>
-      <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #1a5a9a">
-        <div style="padding:1rem; padding-bottom:0">
-          <div class="slabel" style="color:#1a5a9a; font-size:.9rem">Algorithme du diagnostic — enfant de moins de 14 mois</div>
+      <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #1a4a96">
+        <div style="padding:1rem; padding-bottom:.5rem">
+          <div class="slabel" style="color:#1a4a96; font-size:.9rem">🚨 SIGNES D'APPEL DU VIH CHEZ L'ENFANT</div>
+          <div style="font-size:.72rem; color:#546e7a; margin-top:.2rem; font-weight:600">Touchez l'affiche pour l'agrandir</div>
         </div>
-        <infant-followup-flowchart></infant-followup-flowchart>
+        <img src="icons/signes_appel_vih_pediatrique.png" alt="Signes d'appel du VIH pédiatrique" style="width:100%; height:auto; display:block; cursor:zoom-in" onclick="openSignesAppel(this.src)" />
       </div>
       <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #b91c1c">
         <div style="padding:1rem; padding-bottom:0">
@@ -1126,6 +1126,32 @@ window.__ARVP.data = window.PEC_DATA;
         if (ch) ch.classList.add('open');
       }
     }
+  };
+
+  window.openSignesAppel = function (src) {
+    var existing = document.getElementById('img-zoom-overlay');
+    if (existing) existing.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'img-zoom-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:3000;overflow:auto;-webkit-overflow-scrolling:touch;padding:1rem;box-sizing:border-box;display:block;cursor:zoom-out;animation:fadeIn 0.2s ease';
+
+    var imgWrap = document.createElement('div');
+    imgWrap.style.cssText = 'min-width:220%;width:220%;display:block;margin:auto';
+
+    var img = document.createElement('img');
+    img.src = src;
+    img.alt = 'Signes d\'appel du VIH p\u00e9diatrique';
+    img.style.cssText = 'width:100%;height:auto;display:block;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5)';
+
+    imgWrap.appendChild(img);
+    overlay.appendChild(imgWrap);
+
+    overlay.onclick = function () {
+      overlay.remove();
+    };
+
+    document.body.appendChild(overlay);
   };
 
   A.render = render;
