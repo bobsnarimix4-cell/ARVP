@@ -11,7 +11,6 @@ android {
     defaultConfig {
         applicationId = "org.pecvih.arvp"
         minSdk = 24
-        //noinspection EditedTargetSdkVersion
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
