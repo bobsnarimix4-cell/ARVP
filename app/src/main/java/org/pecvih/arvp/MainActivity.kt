@@ -158,6 +158,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         splashScreen.setKeepOnScreenCondition { !isReady.value }
+        splashScreen.setOnExitAnimationListener { splashScreenViewProvider ->
+            splashScreenViewProvider.remove()
+        }
 
         if (SecurityDetector.isAppDisabled() || SecurityDetector.isRemoteDisabled(this)) {
             SecurityDetector.showDeveloperDisabledScreen(this)
