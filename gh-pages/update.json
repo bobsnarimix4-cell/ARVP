@@ -1,10 +1,10 @@
 ﻿{
-    "version":  "5000.21",
-    "versionCode":  1795095760994,
-    "sha256":  "09b745e62b078e2d4b78f3faa61e71d77d5b2543f76e39934f99c42bcfdf8891",
+    "version":  "5000.22",
+    "versionCode":  1795096123090,
+    "sha256":  "0bfbb736a71b63111ae561f3cec3454c9bf72df7154bbbf4095c25e898fa1e87",
     "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
     "minAppVersion":  "1.0",
     "appDisabled":  false,
-    "releaseDate":  "2026-11-19T13:42:40.994Z",
-    "releaseNotes":  "Mise a jour Ressources : remplacement de la liste des signes d\u0027appel par l\u0027affiche officielle avec zoom tactile 220% et suppression de l\u0027algorithme \u003c 14 mois."
+    "releaseDate":  "2026-11-19T13:48:43.090Z",
+    "releaseNotes":  "Mise a jour v5000.22 - Integration directe de l\u0027affiche WebP haute definition embarquee en Data URI dans le bundle chiffrer"
 }
