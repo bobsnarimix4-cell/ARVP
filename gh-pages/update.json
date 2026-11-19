@@ -1,10 +1,10 @@
 ﻿{
-    "version":  "5000.19",
-    "versionCode":  1795047936022,
-    "sha256":  "179fbb080ce66665705e05d6ae44310b37b3d71ca3cacf6022f6e706b2c59355",
+    "version":  "5000.20",
+    "versionCode":  1795048441801,
+    "sha256":  "970e60343d7783d46fe1efb2726fd1219367efb33f9c94fd6436c4df9c44ec6e",
     "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
     "minAppVersion":  "1.0",
     "appDisabled":  false,
-    "releaseDate":  "2026-11-19T00:25:36.022Z",
-    "releaseNotes":  "Mise a jour TPT - Schemas courts 3RH (4-49 kg) et 3HP (\u003e= 50 kg) selon les directives nationales Senegal/OMS"
+    "releaseDate":  "2026-11-19T00:34:01.801Z",
+    "releaseNotes":  "Optimisation de l\u0027espace ecran : masque la barre de signature par defaut et l\u0027affiche uniquement tout en bas de page."
 }

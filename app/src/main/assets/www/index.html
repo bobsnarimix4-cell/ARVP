@@ -40,7 +40,7 @@ body{font-family:'DM Sans',sans-serif;background:#fdfcfb;height:100%;overflow:hi
   padding-top: max(1rem, env(safe-area-inset-top));
   padding-left: max(0.8rem, env(safe-area-inset-left));
   padding-right: max(0.8rem, env(safe-area-inset-right));
-  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  padding-bottom: calc(50px + env(safe-area-inset-bottom));
   min-height: 100vh;
 }
 
@@ -238,7 +238,7 @@ tr.hl td{background:rgba(13,47,122,0.08);font-weight:700;color:#000}
 .itext{font-size:.78rem;color:#0d2a4a;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .idismiss{background:none;border:none;color:rgba(26,79,150,.5);font-size:1.1rem;cursor:pointer;padding:0 .2rem;flex-shrink:0}
 
-.footer{position:fixed;bottom:0;left:0;right:0;z-index:1000;text-align:center;padding:0.3rem 1rem;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,0.05);box-shadow:0 -4px 20px rgba(0,0,0,0.05);padding-bottom:max(0.3rem,env(safe-area-inset-bottom));transition:transform .3s ease,opacity .3s ease}
+.footer{position:fixed;bottom:0;left:0;right:0;z-index:1000;text-align:center;padding:0.3rem 1rem;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,0.05);box-shadow:0 -4px 20px rgba(0,0,0,0.05);padding-bottom:max(0.3rem,env(safe-area-inset-bottom));transition:transform .3s ease,opacity .3s ease;transform:translateY(110%);opacity:0;pointer-events:none}
 .fsrc{font-size:0.58rem;color:#546e7a;margin-bottom:0.05rem;line-height:1.1;opacity:0.8}
 .fauth{font-size:0.6rem;color:#0d2f7a;font-weight:700;letter-spacing:0.01em;overflow-wrap:break-word;word-break:break-word}
 
@@ -1227,25 +1227,61 @@ window.__ARVP.data = window.PEC_DATA;
   A.renderRes();
   A.renderSuivi(NaN);
 
+  function initFooterBehavior() {
+    var footer = document.querySelector('.footer');
+    var scrollContainer = document.getElementById('root');
+
+    function checkBottom() {
+      if (!footer) return;
+      var isAtBottom = false;
+
+      if (scrollContainer && scrollContainer.scrollHeight > 0) {
+        var scrollTop = scrollContainer.scrollTop;
+        var clientHeight = scrollContainer.clientHeight;
+        var scrollHeight = scrollContainer.scrollHeight;
+        isAtBottom = (scrollTop + clientHeight >= scrollHeight - 35);
+      } else {
+        var winScroll = window.pageYOffset || document.documentElement.scrollTop;
+        var winHeight = window.innerHeight;
+        var docHeight = document.documentElement.scrollHeight;
+        isAtBottom = (winScroll + winHeight >= docHeight - 35);
+      }
+
+      if (isAtBottom) {
+        footer.style.transform = 'translateY(0)';
+        footer.style.opacity = '1';
+        footer.style.pointerEvents = 'auto';
+      } else {
+        footer.style.transform = 'translateY(110%)';
+        footer.style.opacity = '0';
+        footer.style.pointerEvents = 'none';
+      }
+    }
+
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', checkBottom, { passive: true });
+    }
+    window.addEventListener('scroll', checkBottom, { passive: true });
+    window.addEventListener('resize', checkBottom, { passive: true });
+
+    document.querySelectorAll('.nav-btn').forEach(function (b) {
+      b.addEventListener('click', function () { setTimeout(checkBottom, 120); });
+    });
+    var inputPoids = document.getElementById('poids');
+    if (inputPoids) {
+      inputPoids.addEventListener('input', function () { setTimeout(checkBottom, 120); });
+    }
+
+    checkBottom();
+  }
+
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
-      var lastScrollTop = 0;
-      var footer = document.querySelector('.footer');
-      if (footer) {
-        window.addEventListener('scroll', function () {
-          var st = window.pageYOffset || document.documentElement.scrollTop;
-          if (st > lastScrollTop && st > 50) {
-            footer.style.transform = 'translateY(110%)';
-            footer.style.opacity = '0';
-          } else {
-            footer.style.transform = 'translateY(0)';
-            footer.style.opacity = '1';
-          }
-          lastScrollTop = st <= 0 ? 0 : st;
-        }, false);
-      }
+      initFooterBehavior();
       navigator.serviceWorker.register('./sw.js');
     });
+  } else {
+    initFooterBehavior();
   }
 
   var deferredPrompt = null;
