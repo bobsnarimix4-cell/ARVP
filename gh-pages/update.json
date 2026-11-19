@@ -1,10 +1,10 @@
 ﻿{
-    "version":  "5000.18",
-    "versionCode":  1794167595084,
-    "sha256":  "ec7abcc5c23e67a96b66389bfcfe51400e92c81da8c2c4dc8f5bbb911cdac13d",
+    "version":  "5000.19",
+    "versionCode":  1795047936022,
+    "sha256":  "179fbb080ce66665705e05d6ae44310b37b3d71ca3cacf6022f6e706b2c59355",
     "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
     "minAppVersion":  "1.0",
     "appDisabled":  false,
-    "releaseDate":  "2026-11-08T19:53:15.084Z",
-    "releaseNotes":  "Reouverture officielle de l\u0027application."
+    "releaseDate":  "2026-11-19T00:25:36.022Z",
+    "releaseNotes":  "Mise a jour TPT - Schemas courts 3RH (4-49 kg) et 3HP (\u003e= 50 kg) selon les directives nationales Senegal/OMS"
 }

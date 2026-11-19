@@ -674,13 +674,17 @@ window.PEC_DATA = {
     { label: '+ de 30 kg ou > 15 ans', susp: '---', simple: '2 cp', fort: '1 cp' },
   ],
 
-  INH: [
-    { p: '3-5,9 kg', d: '50 mg/j' },
-    { p: '6-9,9 kg', d: '100 mg/j' },
-    { p: '10-13,9 kg', d: '150 mg/j' },
-    { p: '14-19,9 kg', d: '200 mg/j' },
-    { p: '20-24,9 kg', d: '250 mg/j' },
-    { p: '>= 25 kg', d: '300 mg/j' },
+  INH_3RH: [
+    { p: '4\u20137 kg', d: '1 cp (75/50 mg) / jour' },
+    { p: '8\u201311 kg', d: '2 cp (75/50 mg) / jour' },
+    { p: '12\u201315 kg', d: '3 cp (75/50 mg) / jour' },
+    { p: '16\u201324 kg', d: '4 cp (75/50 mg) / jour' },
+    { p: '25\u201337 kg', d: '2 cp (150/75 mg) / jour' },
+    { p: '38\u201349 kg', d: '3 cp (150/75 mg) / jour' },
+  ],
+
+  INH_3HP: [
+    { p: '\u2265 50 kg', d: '3 cp en une prise, 1 fois par semaine, pendant 3 mois' },
   ],
 
   IO_LIST: [
@@ -707,9 +711,18 @@ window.PEC_DATA = {
       couleur: '#8a6000',
       bg: 'rgba(255,245,210,.88)',
       border: '#c8920a',
-      desc: "TPT = Traitement Préventif de la Tuberculose : administration d'Isoniazide (INH) pour prévenir la tuberculose chez les enfants VIH+.",
-      details: ["Se fait à l'enrôlement après exclusion d'une tuberculose active par TB-LAM, GeneXpert ou Radiographie thoracique.", 'Isoniazide (INH) : 10 mg/kg/j (max 300 mg/j) pendant 6 mois.', 'Ne pas débuter si tuberculose active confirmée.', 'Surveiller les symptômes TB à chaque consultation.', 'Surveiller les contacts TB dans le ménage.'],
-      tableau: { label: 'Doses INH préventif', cols: ['Poids', 'Dose'], rowsKey: 'INH', hiByWeight: true },
+      desc: "TPT = Traitement Préventif de la Tuberculose chez les personnes vivant avec le VIH.",
+      details: [
+        "Après exclusion d'une TB maladie : dépistage clinique, puis Xpert MTB/RIF Ultra, Truenat, TB-LAM urinaire ou radiographie si suspicion.",
+        "Schéma : 3RH pendant 3 mois, 1 prise par jour, posologie selon le poids.",
+        "Sous dolutégravir (DTG) : 2e dose 12 h après le TAR pendant tout le TPT et 15 jours après son arrêt.",
+        "À partir de 50 kg : 3HP (isoniazide 300 mg + rifapentine 300 mg, 3 cp en une prise par semaine, 3 mois). Ne pas associer le 3HP aux IP, à la doravirine ni au TAF. Femme enceinte ou allaitante : 6H (isoniazide 300 mg, 1 cp par jour, 6 mois).",
+        "Un antécédent de TB maladie ne contre-indique pas le TPT.",
+        "Femme enceinte : suivi obstétrical habituel maintenu.",
+        "Ne pas débuter si TB maladie confirmée ou suspectée.",
+        "Suivi : symptômes TB, croissance, observance, tolérance digestive et hépatique (ictère)."
+      ],
+      tableau: { label: 'Posologie TPT 3RH (3 mois)', cols: ['Poids', 'Dose'], rowsKey: 'INH_3RH' },
     },
     {
       nom: 'Candidose buccale / œsophagienne',
@@ -765,7 +778,7 @@ window.__ARVP.data = window.PEC_DATA;
 
   function isValidData(d) {
     if (!d || typeof d !== 'object') return false;
-    var keys = ['TR', 'ARV', 'SCH', 'SI', 'EF_MOL', 'ARV_MOL', 'PC', 'CTMX', 'INH', 'IO_LIST'];
+    var keys = ['TR', 'ARV', 'SCH', 'SI', 'EF_MOL', 'ARV_MOL', 'PC', 'CTMX', 'INH_3RH', 'IO_LIST'];
     for (var i = 0; i < keys.length; i++) {
       if (!d[keys[i]] || typeof d[keys[i]] !== 'object') return false;
     }
@@ -791,7 +804,14 @@ window.__ARVP.data = window.PEC_DATA;
   }
 
   function inhIdx(w) {
-    return w < 6 ? 0 : w < 10 ? 1 : w < 14 ? 2 : w < 20 ? 3 : w < 25 ? 4 : 5;
+    if (isNaN(w) || w < 4) return -1;
+    if (w <= 7) return 0;
+    if (w <= 11) return 1;
+    if (w <= 15) return 2;
+    if (w <= 24) return 3;
+    if (w <= 37) return 4;
+    if (w <= 49) return 5;
+    return 0;
   }
 
   function setWeight(v) {
@@ -892,42 +912,72 @@ window.__ARVP.data = window.PEC_DATA;
     var isINH = type === 'INH';
     var isCTX = type === 'CTX';
     if (!isINH && !isCTX) return '';
-    var rows = isINH ? A.inh : A.ctmx;
-    var cols = isINH
-      ? ['Poids', 'Dose']
-      : ['Tranche (Poids/\u00c2ge)', 'Sirop (200/40)', 'Cp Simple (400/80)', 'Cp Fort (800/160)'];
-    var title = isINH ? 'Doses INH pr\u00e9ventif' : 'Doses Cotrimoxazole (CTX)';
-    var hi = -1;
-    if (isINH && !isNaN(w)) {
-      hi = A.inhIdx(w);
-    } else if (!isINH && !isNaN(w)) {
-      if (w < 5) hi = 0;
-      else if (w < 15) hi = 1;
-      else if (w < 30) hi = 2;
-      else hi = 3;
-    }
-    var color = isINH ? '#5a4000' : '#0a5e3e';
     var escapeHtml = A.escapeHtml;
-    var h = "<div style='font-size:.68rem;font-weight:700;color:" + color + ";text-transform:uppercase;letter-spacing:.05em;margin:.8rem 0 .35rem'>" + escapeHtml(title) + "</div>";
+
+    if (isCTX) {
+      var rows = A.ctmx;
+      var cols = ['Tranche (Poids/\u00c2ge)', 'Sirop (200/40)', 'Cp Simple (400/80)', 'Cp Fort (800/160)'];
+      var title = 'Doses Cotrimoxazole (CTX)';
+      var hi = -1;
+      if (!isNaN(w)) {
+        if (w < 5) hi = 0;
+        else if (w < 15) hi = 1;
+        else if (w < 30) hi = 2;
+        else hi = 3;
+      }
+      var h = "<div style='font-size:.68rem;font-weight:700;color:#0a5e3e;text-transform:uppercase;letter-spacing:.05em;margin:.8rem 0 .35rem'>" + escapeHtml(title) + "</div>";
+      h += "<div class='twrap' style='overflow-x:auto'><table><thead><tr>";
+      cols.forEach(function (c) { h += '<th>' + escapeHtml(c) + '</th>'; });
+      h += '</tr></thead><tbody>';
+      rows.forEach(function (r, i) {
+        var isHl = hi !== -1 && i === hi;
+        h += "<tr class='" + (isHl ? 'hl' : '') + "'><td>" + escapeHtml(r.label) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.susp) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.simple) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.fort) + '</td></tr>';
+      });
+      h += '</tbody></table></div>';
+      return h;
+    }
+
+    // INH TPT Table
+    var is3HP = !isNaN(w) && w >= 50;
+    var rows = is3HP ? (A.inh3hp || []) : (A.inh3rh || []);
+    var cols = ['Poids', 'Dose'];
+    var title = is3HP ? 'Posologie TPT 3HP (3 mois)' : 'Posologie TPT 3RH (3 mois)';
+    var hi = -1;
+    if (is3HP) {
+      hi = 0;
+    } else if (!isNaN(w) && w >= 4 && w < 50) {
+      hi = A.inhIdx(w);
+    }
+    var h = "<div style='font-size:.68rem;font-weight:700;color:#5a4000;text-transform:uppercase;letter-spacing:.05em;margin:.8rem 0 .35rem'>" + escapeHtml(title) + "</div>";
     h += "<div class='twrap' style='overflow-x:auto'><table><thead><tr>";
     cols.forEach(function (c) { h += '<th>' + escapeHtml(c) + '</th>'; });
     h += '</tr></thead><tbody>';
     rows.forEach(function (r, i) {
       var isHl = hi !== -1 && i === hi;
-      if (isINH) {
-        h += "<tr class='" + (isHl ? 'hl' : '') + "'><td>" + escapeHtml(r.p) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.d) + '</td></tr>';
-      } else {
-        h += "<tr class='" + (isHl ? 'hl' : '') + "'><td>" + escapeHtml(r.label) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.susp) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.simple) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.fort) + '</td></tr>';
-      }
+      h += "<tr class='" + (isHl ? 'hl' : '') + "'><td>" + escapeHtml(r.p) + "</td><td style='font-family:DM Mono,monospace;font-weight:500'>" + escapeHtml(r.d) + '</td></tr>';
     });
     h += '</tbody></table></div>';
+
+    if (is3HP) {
+      h += "<div style='margin-top:.8rem; background:rgba(255,243,224,0.9); border:1px solid #ffe0b2; border-left:4px solid #e65100; border-radius:10px; padding:.75rem .9rem; font-size:.78rem; color:#5c2600; line-height:1.45'><b>Femme enceinte ou allaitante : 6H</b> \u2014 Isoniazide 300 mg, 1 comprim\u00e9 par jour pendant 6 mois (pas de 3HP). Suivi obst\u00e9trical habituel maintenu.</div>";
+    }
     return h;
   }
 
   function renderProphylaxies(w) {
+    var is3HP = !isNaN(w) && w >= 50;
     var rh = '';
     rh += "<div class='card' style='border-left:4px solid #0e7a4e; background:rgba(232, 245, 233, 0.85)'><div class='slabel' style='color:#0e7a4e; font-size:.9rem'>\uD83E\uDE79 TRAITEMENTS PR\u00c9VENTIFS (Prophylaxies)</div>";
-    rh += "<div style='margin-bottom:1.5rem'><div style='display:flex; align-items:center; gap:8px; margin-bottom:8px'><span style='background:#0e7a4e; color:white; padding:4px 8px; border-radius:6px; font-weight:800; font-size:0.75rem'>INH</span><b style='color:#1a1a1a; font-size:0.85rem'>ISONIAZIDE (100 mg)</b></div><div style='font-size:.78rem; color:#2c2c2a; margin-left:5px; line-height:1.4'>Pr\u00e9vient la Tuberculose. \u00c0 donner pendant 6 mois (10mg/kg/j, max 300mg) apr\u00e8s exclusion TB active.</div>" + genTable('INH', w) + '</div>';
+
+    rh += "<div style='margin-bottom:1.5rem'>";
+    if (is3HP) {
+      rh += "<div style='display:flex; align-items:center; gap:8px; margin-bottom:8px'><span style='background:#0e7a4e; color:white; padding:4px 8px; border-radius:6px; font-weight:800; font-size:0.75rem'>3HP</span><b style='color:#1a1a1a; font-size:0.85rem'>3HP : ISONIAZIDE\u2013RIFAPENTINE</b></div>";
+      rh += "<div style='font-size:.78rem; color:#2c2c2a; margin-left:5px; line-height:1.4'>Pr\u00e9vient la tuberculose. 3 mois, 1 prise par semaine, apr\u00e8s exclusion d'une TB maladie. Ne pas associer aux inhibiteurs de prot\u00e9ase, \u00e0 la doravirine ni au TAF.</div>";
+    } else {
+      rh += "<div style='display:flex; align-items:center; gap:8px; margin-bottom:8px'><span style='background:#0e7a4e; color:white; padding:4px 8px; border-radius:6px; font-weight:800; font-size:0.75rem'>3RH</span><b style='color:#1a1a1a; font-size:0.85rem'>3RH : RIFAMPICINE\u2013ISONIAZIDE</b></div>";
+      rh += "<div style='font-size:.78rem; color:#2c2c2a; margin-left:5px; line-height:1.4'>Pr\u00e9vient la tuberculose. 3 mois, 1 prise par jour, apr\u00e8s exclusion d'une TB maladie. Sous DTG : 2e dose de DTG 12 h apr\u00e8s le TAR pendant le TPT et 15 jours apr\u00e8s l'arr\u00eat.</div>";
+    }
+    rh += genTable('INH', w) + '</div>';
     rh += "<hr style='border:0; border-top:1px dashed #0e7a4e; margin:1.5rem 0; opacity:0.2'>";
     rh += "<div><div style='display:flex; align-items:center; gap:8px; margin-bottom:8px'><span style='background:#1a5ab8; color:white; padding:4px 8px; border-radius:6px; font-weight:800; font-size:0.75rem'>CTX</span><b style='color:#1a1a1a; font-size:0.85rem'>COTRIMOXAZOLE</b></div><div style='font-size:.78rem; color:#2c2c2a; margin-left:5px; line-height:1.4'>Pr\u00e9vient les infections opportunistes. Arr\u00eat si CV < 1000 copies sur 2 mesures cons\u00e9cutives.</div>" + genTable('CTX', w) + '</div></div>';
     return rh;
@@ -1112,7 +1162,9 @@ window.__ARVP.data = window.PEC_DATA;
   A.arvMol = D.ARV_MOL;
   A.pc = D.PC;
   A.ctmx = D.CTMX;
-  A.inh = D.INH;
+  A.inh3rh = D.INH_3RH;
+  A.inh3hp = D.INH_3HP;
+  A.inh = D.INH_3RH;
   A.ioList = D.IO_LIST;
 
   var currentPage = 'calc';
