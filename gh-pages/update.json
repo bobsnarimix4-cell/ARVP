@@ -1,10 +1,9 @@
-﻿{
-    "version":  "5000.22",
-    "versionCode":  1795096123090,
-    "sha256":  "0bfbb736a71b63111ae561f3cec3454c9bf72df7154bbbf4095c25e898fa1e87",
-    "url":  "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
-    "minAppVersion":  "1.0",
-    "appDisabled":  false,
-    "releaseDate":  "2026-11-19T13:48:43.090Z",
-    "releaseNotes":  "Mise a jour v5000.22 - Integration directe de l\u0027affiche WebP haute definition embarquee en Data URI dans le bundle chiffrer"
+{
+  "version": "5000.23",
+  "versionCode": 1795099239944,
+  "sha256": "9e1253fe988bff66a1d3b39fcf0bba08572c3e53ae18b90c1fe4203d4a4ce526",
+  "url": "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
+  "minAppVersion": "1.0",
+  "releaseDate": "2026-11-19T14:40:39.945Z",
+  "releaseNotes": "Mise à jour automatique des données cliniques et du contenu."
 }

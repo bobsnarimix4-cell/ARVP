@@ -1,7 +1,7 @@
 /* Données cliniques — PEC VIH pédiatrique Sénégal / OMS */
 window.__ARVP = window.__ARVP || {};
 window.PEC_DATA = {
-  version: "5000.13", // Mise à jour complète — réorganisation ressources + effets secondaires filtrés
+  version: "5000.23", // Mise à jour v5000.23 — Affiche WebP + TPT + Flowchart MVA
   SI: {
     a: { label: 'Formulation préférentielle', color: '#0d2f7a', bg: '#b8cef8', border: '#3a6ad4' },
     b: { label: 'Formulation optionnelle 1', color: '#1a4aaa', bg: '#ccdaf8', border: '#5a88d8' },
