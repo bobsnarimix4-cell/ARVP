@@ -1,7 +1,7 @@
 /* Données cliniques — PEC VIH pédiatrique Sénégal / OMS */
 window.__ARVP = window.__ARVP || {};
 window.PEC_DATA = {
-  version: "5000.23", // Mise à jour v5000.23 — Affiche WebP + TPT + Flowchart MVA
+  version: "5000.26", // v5000.26 — sections Effets secondaires & IO supprimées
   SI: {
     a: { label: 'Formulation préférentielle', color: '#0d2f7a', bg: '#b8cef8', border: '#3a6ad4' },
     b: { label: 'Formulation optionnelle 1', color: '#1a4aaa', bg: '#ccdaf8', border: '#5a88d8' },
@@ -91,55 +91,6 @@ window.PEC_DATA = {
     { pref: 'TAF : 1 cp (prise unique /j)', opts: ['TLD (TDF+3TC+DTG) : 1 cp (prise unique /j)', 'ALD (ABC/3TC/DTG) 600/300/50 : 1 cp (prise unique /j)', 'ABC+3TC 600/300 mg : 1 cp/j + DTG 50 mg : 1 cp/j'] },
   ],
 
-  EF_MOL: {
-    'ABC (Abacavir)': {
-      freq: ['Nausées, vomissements (début de traitement)', 'Céphalées, fatigue', 'Diarrhée légère'],
-      grave: ["Réaction d'hypersensibilité : fièvre, éruption, myalgies => ARRÊT IMMÉDIAT et DÉFINITIF (ne jamais réintroduire)", 'Acidose lactique (rare)'],
-      surv: ['Test HLA-B*5701 avant initiation si disponible', 'Surveiller J15, J30, M3', "Arrêt immédiat si signes d'hypersensibilité"],
-    },
-    '3TC (Lamivudine)': {
-      freq: ['Généralement bien toléré', 'Céphalées, fatigue modérée', 'Nausées légères'],
-      grave: ['Acidose lactique (très rare)', 'Hépatomégalie avec stéatose (rare)'],
-      surv: ['Transaminases si signes cliniques', 'NFS si anémie suspectée'],
-    },
-    'DTG (Dolutegravir)': {
-      freq: ['Insomnie, cauchemars, rêves intenses', 'Céphalées', 'Nausées modérées', 'Prise de poids : Effet métabolique documenté, à surveiller régulièrement sur les courbes de croissance de l\'enfant.'],
-      grave: ["Réaction d'hypersensibilité avec atteinte hépatique (rare)", 'Augmentation CPK — myopathie (rare)', 'Risque malformation tube neural si prise en début de grossesse => éviter au 1er trimestre'],
-      interact: [
-        'Cations polyvalents (Fer, Calcium, Magnésium, Aluminium) : Réduisent l\'absorption. Espacer de 2h avant ou 6h après.',
-        'Anticonvulsivants (Carbamazépine, Phénobarbital, Phénytoïne) : Diminuent l\'efficacité. Nécessite une double dose de DTG.',
-        'Rifampicine (Traitement TB) : Diminue fortement les taux. Impose une double dose de DTG (2 prises/j).'
-      ],
-      surv: ['Transaminases à M1, M3, M6', 'Glycémie (légère élévation possible)', 'CPK si douleurs musculaires'],
-    },
-    'TDF (Tenofovir DF)': {
-      freq: ['Nausées, flatulences (début)', 'Céphalées'],
-      grave: ['Néphrotoxicité : tubulopathie rénale => surveiller créatinine et phosphorémie', 'Déminéralisation osseuse (ostéopénie/ostéoporose) à long terme', 'Syndrome de Fanconi (rare)'],
-      surv: ['Créatinine + phosphorémie à M1, M3, M6 puis annuel', 'DFG si insuffisance rénale', 'Densité osseuse si symptômes'],
-    },
-    'TAF (Tenofovir AF)': {
-      freq: ['Nausées légères', 'Céphalées', 'Fatigue'],
-      grave: ['Acidose lactique (rare — classe INTI)', 'Toxicité rénale inférieure au TDF mais à surveiller'],
-      surv: ['Fonction rénale annuelle', 'Densité osseuse si signes cliniques'],
-    },
-    'LPV/r (Lopinavir/Ritonavir)': {
-      freq: ['Diarrhée, nausées, vomissements (fréquents)', 'Douleurs abdominales', 'Dyslipidémie'],
-      grave: ['Hépatotoxicité (transaminases élevées)', 'Troubles du rythme cardiaque (allongement QT)', 'Lipodystrophie', 'Hyperglycémie'],
-      surv: ['Transaminases M1, M3, M6', 'Bilan lipidique à M3, M6 puis annuel', 'Glycémie à jeun', 'ECG si symptômes cardiaques'],
-    },
-  },
-
-  ARV_MOL: {
-    'ABC + 3TC 120/60 mg': ['ABC (Abacavir)', '3TC (Lamivudine)'],
-    'ABC + 3TC 600/300 mg': ['ABC (Abacavir)', '3TC (Lamivudine)'],
-    'DTG 10 mg dispersible': ['DTG (Dolutegravir)'],
-    'DTG 50 mg': ['DTG (Dolutegravir)'],
-    'pALD (ABC/3TC/DTG) 60/30/5': ['ABC (Abacavir)', '3TC (Lamivudine)', 'DTG (Dolutegravir)'],
-    'ALD (ABC/3TC/DTG) 600/300/50': ['ABC (Abacavir)', '3TC (Lamivudine)', 'DTG (Dolutegravir)'],
-    TAF: ['TAF (Tenofovir AF)'],
-    'TLD (TDF+3TC+DTG)': ['TDF (Tenofovir DF)', '3TC (Lamivudine)', 'DTG (Dolutegravir)'],
-  },
-
   PC: {
     'ABC + 3TC 120/60 mg': '#f57c00', // Orange (Label)
     'ABC + 3TC 600/300 mg': '#ff9800', // Jaune Orangé (Adulte)
@@ -158,70 +109,17 @@ window.PEC_DATA = {
     { label: '+ de 30 kg ou > 15 ans', susp: '---', simple: '2 cp', fort: '1 cp' },
   ],
 
-  INH: [
-    { p: '3-5,9 kg', d: '50 mg/j' },
-    { p: '6-9,9 kg', d: '100 mg/j' },
-    { p: '10-13,9 kg', d: '150 mg/j' },
-    { p: '14-19,9 kg', d: '200 mg/j' },
-    { p: '20-24,9 kg', d: '250 mg/j' },
-    { p: '>= 25 kg', d: '300 mg/j' },
+  INH_3RH: [
+    { p: '4\u20137 kg', d: '1 cp (75/50 mg) / jour' },
+    { p: '8\u201311 kg', d: '2 cp (75/50 mg) / jour' },
+    { p: '12\u201315 kg', d: '3 cp (75/50 mg) / jour' },
+    { p: '16\u201324 kg', d: '4 cp (75/50 mg) / jour' },
+    { p: '25\u201337 kg', d: '2 cp (150/75 mg) / jour' },
+    { p: '38\u201349 kg', d: '3 cp (150/75 mg) / jour' },
   ],
 
-  IO_LIST: [
-    {
-      nom: 'Cotrimoxazole',
-      couleur: '#0e7a4e',
-      bg: 'rgba(220,245,230,.85)',
-      border: '#0e7a4e',
-      desc: 'Prophylaxie systématique chez tout enfant VIH exposé ou infecté.',
-      details: ['Indications : CD4 bas, stade OMS 3 ou 4, ou tout enfant < 5 ans VIH+.', 'Arrêt possible si CD4 > 350 cel/mm³ stable sous TARV pendant 6 mois.', 'Surveiller allergie cutanée, cytopénie.'],
-      tableau: { label: 'Doses Cotrimoxazole', cols: ['Âge', 'Dose'], rowsKey: 'CTMX' },
-    },
-    {
-      nom: 'Fluconazole',
-      couleur: '#1a5a9a',
-      bg: 'rgba(215,230,250,.85)',
-      border: '#1a5aaa',
-      desc: 'Traitement et prévention secondaire de la cryptococcose méningée.',
-      details: ['Indication : méningite à Cryptococcus confirmée (Ag cryptococcique positif, culture LCR).', 'Induction : Amphotéricine B + Flucytosine 14 jours.', 'Consolidation : Fluconazole 400 mg/j × 8 semaines.', "Maintenance : Fluconazole 200 mg/j jusqu'à CD4 > 200 cel/mm³ stable 6 mois."],
-      tableau: null,
-    },
-    {
-      nom: 'Traitement Préventif Tuberculose (TPT)',
-      couleur: '#8a6000',
-      bg: 'rgba(255,245,210,.88)',
-      border: '#c8920a',
-      desc: "TPT = Traitement Préventif de la Tuberculose : administration d'Isoniazide (INH) pour prévenir la tuberculose chez les enfants VIH+.",
-      details: ["Se fait à l'enrôlement après exclusion d'une tuberculose active par TB-LAM, GeneXpert ou Radiographie thoracique.", 'Isoniazide (INH) : 10 mg/kg/j (max 300 mg/j) pendant 6 mois.', 'Ne pas débuter si tuberculose active confirmée.', 'Surveiller les symptômes TB à chaque consultation.', 'Surveiller les contacts TB dans le ménage.'],
-      tableau: { label: 'Doses INH préventif', cols: ['Poids', 'Dose'], rowsKey: 'INH', hiByWeight: true },
-    },
-    {
-      nom: 'Candidose buccale / œsophagienne',
-      couleur: '#6b21a8',
-      bg: 'rgba(240,225,255,.85)',
-      border: '#8b3ac8',
-      desc: "Infection fongique fréquente en cas d'immunodépression sévère.",
-      details: ['Traitement : Fluconazole 3-6 mg/kg/j × 7-14 jours (buccale) ou 14-21 jours (œsophagienne).', 'Alternative : Nystatine suspension orale pour les formes légères buccales.', 'Prévention secondaire si récidives fréquentes.', "Optimiser le TARV pour restaurer l'immunité."],
-      tableau: null,
-    },
-    {
-      nom: 'Diarrhée chronique',
-      couleur: '#a05000',
-      bg: 'rgba(255,235,210,.85)',
-      border: '#c07020',
-      desc: 'Diarrhée > 14 jours chez l\'enfant VIH : étiologies multiples à rechercher.',
-      details: ['Rechercher : Cryptosporidium, Microsporidium, CMV, Isospora, bactéries.', 'Examens : coproculture, examen parasitologique des selles, coloration de Ziehl.', 'Traitement étiologique si agent identifié.', 'Le cotrimoxazole couvre Isospora belli.', 'Réhydratation et support nutritionnel systématique.'],
-      tableau: null,
-    },
-    {
-      nom: 'Dermatoses',
-      couleur: '#5a7a00',
-      bg: 'rgba(230,245,205,.85)',
-      border: '#7a9a20',
-      desc: 'Manifestations cutanées fréquentes en cas de VIH pédiatrique non contrôlé.',
-      details: ['Prurigo stroph. : antihistaminiques, crèmes émollientes.', 'Molluscum contagiosum : cryothérapie, imiquimod si nombreux.', 'Zona : Acyclovir 80 mg/kg/j en 4 prises × 7-10 jours.', 'Gale : Benzoate de benzyle ou Perméthrine topique.', 'Amélioration attendue with restauration immunitaire sous TARV.'],
-      tableau: null,
-    },
-  ],
+  INH_3HP: [
+    { p: '\u2265 50 kg', d: '3 cp en une prise, 1 fois par semaine, pendant 3 mois' },
+  ]
 };
 window.__ARVP.data = window.PEC_DATA;

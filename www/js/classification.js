@@ -2,14 +2,29 @@
 (function () {
   function tIdx(w) {
     var TR = window.__ARVP.tranches;
+    if (isNaN(w)) return -1;
     for (var i = 0; i < TR.length; i++) {
-      if (w >= TR[i].min && w <= TR[i].max) return i;
+      var next = TR[i + 1];
+      if (w >= TR[i].min && (next ? w < next.min : w <= TR[i].max)) return i;
     }
     return -1;
   }
 
   function inhIdx(w) {
-    return w < 6 ? 0 : w < 10 ? 1 : w < 14 ? 2 : w < 20 ? 3 : w < 25 ? 4 : 5;
+    if (isNaN(w) || w < 4) return -1;
+    if (w <= 7) return 0;
+    if (w <= 11) return 1;
+    if (w <= 15) return 2;
+    if (w <= 24) return 3;
+    if (w <= 37) return 4;
+    if (w <= 49) return 5;
+    return -1;
+  }
+
+  function parseWeight(raw) {
+    if (typeof raw === 'number') return raw;
+    var s = String(raw == null ? '' : raw).trim().replace(',', '.');
+    return s === '' ? NaN : Number(s);
   }
 
   function setWeight(v) {
@@ -38,6 +53,7 @@
   window.setWeight = setWeight;
   window.__ARVP.tIdx = tIdx;
   window.__ARVP.inhIdx = inhIdx;
+  window.__ARVP.parseWeight = parseWeight;
   window.__ARVP.setWeight = setWeight;
   window.__ARVP.dk = dk;
   window.__ARVP.pDose = pDose;

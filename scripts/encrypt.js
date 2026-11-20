@@ -34,7 +34,12 @@ function encrypt(plaintext) {
 
 function buildHTML() {
   const cssFile = path.join(WWW, 'css', 'styles.css');
-  const css = '<style>\n' + fs.readFileSync(cssFile, 'utf8') + '\n</style>';
+  // Dans www/css/styles.css, les images sont référencées en ../icons/ (valide pour
+  // la source et la PWA). Une fois le CSS inliné dans le HTML à la racine, il faut
+  // revenir à icons/ pour que les chemins restent corrects dans le bundle.
+  const cssSource = fs.readFileSync(cssFile, 'utf8')
+    .replace(/url\((['"]?)\.\.\/icons\//g, 'url($1icons/');
+  const css = '<style>\n' + cssSource + '\n</style>';
 
   const jsFiles = [
     'js/data.js',
@@ -56,19 +61,30 @@ function buildHTML() {
     }
   }
 
-  const indexHtml = fs.readFileSync(path.join(WWW, 'index.html'), 'utf8');
+  // La source charge le CSS et le JS en fichiers séparés : ils sont inlinés ci-dessous.
+  // On retire donc ces références, sinon le HTML assemblé contient des 404
+  // (ou une double exécution des scripts si les dossiers sont copiés dans les assets).
+  const indexHtml = fs.readFileSync(path.join(WWW, 'index.html'), 'utf8')
+    .replace(/<link[^>]+href=["']css\/styles\.css["'][^>]*>\s*/gi, '')
+    .replace(/<script[^>]+src=["']js\/[^"']+["'][^>]*>\s*<\/script>\s*/gi, '');
+
   const headClose = indexHtml.indexOf('</head>');
+  const bodyOpen = indexHtml.indexOf('<body>');
   const bodyClose = indexHtml.indexOf('</body>');
 
   let html;
-  if (headClose !== -1 && bodyClose !== -1) {
+  if (headClose !== -1 && bodyOpen !== -1 && bodyClose !== -1) {
     const headContent = indexHtml.substring(0, headClose);
-    const bodyContent = indexHtml.substring(headClose + 7, bodyClose);
+    const bodyContent = indexHtml.substring(bodyOpen + '<body>'.length, bodyClose);
     html = headContent + '\n' + css + '\n</head>\n<body>' + bodyContent + '\n' + scripts + '</body>\n</html>';
   } else {
-    html = '<style>' + fs.readFileSync(path.join(WWW, 'css', 'styles.css'), 'utf8') + '</style>' +
-      indexHtml.substring(indexHtml.indexOf('<body>'), indexHtml.indexOf('</body>') + 7) +
+    html = css + indexHtml.substring(bodyOpen, bodyClose) +
       scripts + '</body></html>';
+  }
+
+  // Garde-fou : aucune référence locale externe ne doit subsister dans le bundle.
+  if (/<script[^>]+src=["'](?:\.\/)?js\//i.test(html) || /<link[^>]+href=["'](?:\.\/)?css\//i.test(html)) {
+    throw new Error('Référence CSS/JS locale restante dans le HTML assemblé (inlining incomplet).');
   }
 
   return html;
@@ -126,15 +142,20 @@ function main() {
   fs.writeFileSync(encPath, encJson, 'utf8');
   console.log('   Written:', path.relative(ROOT, encPath));
 
+  // Le bundle chiffré est la seule source utilisée par l'application (CryptoManager).
+  // Un index.html en clair dans les assets exposerait le contenu et serait obsolète.
+  const plaintextPath = path.join(ASSETS_WWW, 'index.html');
+  if (fs.existsSync(plaintextPath)) {
+    fs.unlinkSync(plaintextPath);
+    console.log('   Removed stale plaintext index.html');
+  }
+
   console.log('4. Copying assets to www/...');
   copyAssetsToWWW();
 
   console.log('5. Computing SHA-256 hash...');
   const hash = crypto.createHash('sha256').update(encJson).digest('hex');
   console.log('   SHA-256:', hash);
-
-  const hashPath = path.join(ROOT, 'scripts', '.last-build-hash');
-  fs.writeFileSync(hashPath, hash, 'utf8');
 
   console.log('\nBuild complete. Encrypted content ready for Android.');
   console.log('Run "node scripts/buildARVP.js" to generate update.json.');

@@ -64,7 +64,7 @@
       <div class="card">
         <label class="wlabel" for="poids">Poids de l'enfant</label>
         <div class="wrow">
-          <input type="number" id="poids" class="winput" step="0.1" min="0" placeholder="0.0" inputmode="decimal" aria-label="Poids de l'enfant en kilogrammes"/>
+          <input type="text" id="poids" class="winput" placeholder="0.0" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" autocomplete="off" aria-label="Poids de l'enfant en kilogrammes"/>
           <span class="ubadge">kg</span>
         </div>
         <div class="rbar" id="rbar" aria-hidden="true"></div>
@@ -94,12 +94,12 @@
 
     <!-- PAGE RESSOURCE -->
     <div id="page-res" class="page-content">
-      <div class="card" style='border-left:4px solid #1a4a96'><div class='slabel' style='color:#1a4a96;font-size:.9rem'>🚨 SIGNES D'APPEL DU VIH CHEZ L'ENFANT</div><div style='font-size:.78rem;color:#1a3a5c;margin-bottom:.8rem;line-height:1.4'>Rechercher systématiquement ces signes chez tout enfant suspecté ou confirmé VIH+ :</div><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Cassure de la courbe staturo-pondérale</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Mauvaise prise pondérale</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Mauvaise croissance staturale</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Signes neurologiques</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Microcéphalie acquise</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Dyspraxie bucco-lingale</li></ul><div style='font-size:.75rem;font-weight:700;margin-top:.6rem;color:#1a4a96;text-transform:uppercase'>Infections</div><ul class='rlist'><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Muguet étendu hors période néonatale</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Écoulement de l'oreille persistant</li><li class='ritem'><span class='rdot' style='background:#1a4a96'></span>Infections sévères répétées</li></ul></div>
-      <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #1a5a9a">
-        <div style="padding:1rem; padding-bottom:0">
-          <div class="slabel" style="color:#1a5a9a; font-size:.9rem">Algorithme du diagnostic — enfant de moins de 14 mois</div>
+      <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #1a4a96">
+        <div style="padding:0.6rem 1rem; background:rgba(26,74,150,0.05); display:flex; align-items:center; justify-content:space-between">
+          <span style="font-size:.72rem; color:#546e7a; font-weight:600">Touchez pour afficher en plein écran</span>
+          <span style="font-size:.68rem; color:#1a4a96; font-weight:700">🔍 Plein écran</span>
         </div>
-        <infant-followup-flowchart></infant-followup-flowchart>
+        <img src="icons/signes_appel_vih_pediatrique.webp" alt="Signes d'appel du VIH pédiatrique" class="zoomable" width="1716" height="1235" tabindex="0" role="button" aria-label="Agrandir l'affiche des signes d'appel" style="width:100%; height:auto; display:block; cursor:zoom-in" />
       </div>
       <div class="card" style="padding:0; overflow:hidden; margin-bottom:.7rem; border-left:4px solid #b91c1c">
         <div style="padding:1rem; padding-bottom:0">
@@ -107,7 +107,79 @@
         </div>
         <mva-pediatric-flowchart></mva-pediatric-flowchart>
       </div>
-      <div id="results-res"></div>
+
+      <!-- MVA : définition (aide-mémoire PEC_MVA) -->
+      <div class="card mva-card">
+        <div class="slabel" style="color:#b91c1c;font-size:.9rem">MVA — Définition</div>
+        <div class="mva-intro">Un enfant est à un stade avancé de la maladie à VIH (MVA) s’il répond à l’un des critères suivants :</div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">Enfant de moins de 5 ans</span><span class="mva-tag red">D’emblée MVA</span></div>
+          <div class="mva-text">Un enfant nouvellement dépisté est classé MVA quel que soit son stade clinique.</div>
+          <div class="mva-note"><b>NB :</b> les enfants de moins de 5 ans sous TAR depuis plus d’un an avec CV indétectable ne sont plus classés MVA.</div>
+        </div>
+        <div class="mva-block" style="margin-bottom:0">
+          <div class="mva-block-head"><span class="mva-block-title">Enfant de plus de 5 ans</span><span class="mva-tag orange">Un seul suffit</span></div>
+          <ul class="rlist">
+            <li class="ritem"><span class="rdot" style="background:#b91c1c"></span>Stades 3 ou 4</li>
+            <li class="ritem"><span class="rdot" style="background:#b91c1c"></span>Stade 1 ou 2 avec taux de CD4+ &lt; 200 /mm³</li>
+            <li class="ritem"><span class="rdot" style="background:#b91c1c"></span>Retour aux soins après une interruption thérapeutique</li>
+            <li class="ritem"><span class="rdot" style="background:#b91c1c"></span>Échec thérapeutique</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- MVA : conduite à tenir -->
+      <div class="card mva-card">
+        <div class="slabel" style="color:#b91c1c;font-size:.9rem">Conduite à tenir devant une MVA</div>
+        <div class="mva-block">
+          <div class="mva-q">Est-ce une MVA ?</div>
+          <div class="mva-branch"><span class="mva-tag blue">&lt; 5 ans</span><span>Toujours MVA (sauf TAR &gt; 1 an + CV indétectable)</span></div>
+          <div class="mva-branch"><span class="mva-tag blue">&gt; 5 ans</span><span>Stade 3 ou 4 · stade 1 ou 2 avec CD4 &lt; 200 /mm³ · retour aux soins après interruption · échec thérapeutique</span></div>
+          <div class="mva-branch" style="margin-bottom:0"><span class="mva-tag green">Non</span><span>Suivi habituel</span></div>
+        </div>
+        <div style="font-size:.75rem;font-weight:700;margin:.2rem 0 .5rem;color:#b91c1c;text-transform:uppercase">Si oui : S · T · O · P</div>
+        <div class="mva-step">
+          <div class="mva-letter" style="background:#1a5ab8">S</div>
+          <div><div class="mva-step-title">Dépister <small>(Screen)</small></div><div class="mva-text">CD4 · tuberculose (TB-LAM urinaire, Xpert) · cryptococcose (CrAg LFA) · malnutrition</div></div>
+        </div>
+        <div class="mva-step">
+          <div class="mva-letter" style="background:#b91c1c">T</div>
+          <div><div class="mva-step-title">Traiter <small>(Treat)</small></div><div class="mva-text">Traiter sans délai les affections opportunistes, selon le protocole national</div></div>
+        </div>
+        <div class="mva-step">
+          <div class="mva-letter" style="background:#2e7d32">O</div>
+          <div><div class="mva-step-title">Optimiser le TAR <small>(Optimize)</small></div><div class="mva-text">Charge virale · dépister l’échec thérapeutique · renforcer l’ETP · schéma TAR optimisé</div></div>
+        </div>
+        <div class="mva-step" style="margin-bottom:0">
+          <div class="mva-letter" style="background:#e65100">P</div>
+          <div><div class="mva-step-title">Prévenir <small>(Prevent)</small></div><div class="mva-text">TPT · cotrimoxazole · vaccination adaptée</div></div>
+        </div>
+      </div>
+
+      <!-- MVA : vaccination -->
+      <div class="card mva-card">
+        <div class="slabel" style="color:#b91c1c;font-size:.9rem">MVA et vaccination</div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">Vaccins inactivés <small style="font-size:0.7rem;font-weight:600;opacity:0.85">(hexavalent)</small></span><span class="mva-tag green">Toujours</span></div>
+          <div class="mva-text">Indiqués même en cas de MVA.</div>
+        </div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">Vaccins vivants atténués (RR)</span><span class="mva-tag orange">Retarder</span></div>
+          <div class="mva-text">Rougeole-Rubéole : à administrer seulement après stabilisation clinique et CV indétectable. 2 doses à 6-12 mois d’intervalle.</div>
+        </div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">BCG</span><span class="mva-tag orange">Différer</span></div>
+          <div class="mva-text">Jusqu’à stabilisation clinique sous TAR + CV indétectable.</div>
+        </div>
+        <div class="mva-block">
+          <div class="mva-block-head"><span class="mva-block-title">Fièvre jaune</span><span class="mva-tag blue">Sous conditions</span></div>
+          <div class="mva-text">Possible après stabilisation clinique + CV indétectable.</div>
+        </div>
+        <div class="mva-block" style="margin-bottom:0">
+          <div class="mva-block-head"><span class="mva-block-title">HPV</span><span class="mva-tag blue">2 doses</span></div>
+          <div class="mva-text">Deux (2) doses espacées de 6 mois chez les filles âgées de 9 à 14 ans.</div>
+        </div>
+      </div>
     </div>
 
     <div class="footer">
@@ -115,12 +187,13 @@
     </div>
   </div>
 </div>
-<script src="js/data.js"></script>
-<script src="js/validation.js"></script>
-<script src="js/classification.js"></script>
-<script src="js/render.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/mva-pediatric-flowchart.js"></script>
-<script src="js/infant-followup-flowchart.js"></script>
+
+  <script src="js/data.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/classification.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/mva-pediatric-flowchart.js"></script>
+  <script src="js/infant-followup-flowchart.js"></script>
 </body>
 </html>
