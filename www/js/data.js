@@ -1,7 +1,7 @@
 /* Données cliniques — PEC VIH pédiatrique Sénégal / OMS */
 window.__ARVP = window.__ARVP || {};
 window.PEC_DATA = {
-  version: "5000.26", // v5000.26 — sections Effets secondaires & IO supprimées
+  version: "5000.27", // v5000.27 — Affiche intégrée en Base64 WebP pour MAJ OTA 100% hors-ligne
   SI: {
     a: { label: 'Formulation préférentielle', color: '#0d2f7a', bg: '#b8cef8', border: '#3a6ad4' },
     b: { label: 'Formulation optionnelle 1', color: '#1a4aaa', bg: '#ccdaf8', border: '#5a88d8' },

@@ -63,8 +63,7 @@ function main() {
   check((html.match(/<html/g) || []).length === 1, 'un seul <html>');
   check(html.includes('MVA — Définition'), 'contenu MVA présent');
   check(html.includes('INH_3RH') && html.includes('INH_3HP'), 'données TPT 3RH/3HP présentes');
-  check(html.includes('icons/signes_appel_vih_pediatrique.webp'), 'affiche référencée en fichier WebP');
-  check(!html.includes('data:image/webp;base64,'), 'aucune affiche base64 dans le bundle');
+  check(html.includes('data:image/webp;base64,'), 'affiche embarquée en base64 WebP');
   check(!html.includes('io-btn') && !html.includes('io-table'), 'section IO_LIST absente du bundle');
   check(!html.includes('mol-btn') && !html.includes('EF_MOL'), 'section Effets secondaires & interactions absente');
   check(!html.includes('results-res'), 'conteneur IO retiré du HTML');

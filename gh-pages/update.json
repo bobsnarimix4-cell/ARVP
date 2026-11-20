@@ -1,9 +1,9 @@
 {
-  "version": "5000.26",
-  "versionCode": 1795156939199,
-  "sha256": "c530bf71ca767ca9c4b21014e47f8c43934c9a22b80c64c72ffe5d250b87f9ac",
+  "version": "5000.27",
+  "versionCode": 1795158398517,
+  "sha256": "c0e112118bbebc53a994bf1d19ca8492e20fed49a933dde1dd3ac66617007f70",
   "url": "https://bobsnarimix4-cell.github.io/ARVP/gh-pages/index.html.enc",
   "minAppVersion": "1.0",
-  "releaseDate": "2026-11-20T06:42:19.199Z",
+  "releaseDate": "2026-11-20T07:06:38.517Z",
   "releaseNotes": "Mise à jour automatique des données cliniques et du contenu."
 }
