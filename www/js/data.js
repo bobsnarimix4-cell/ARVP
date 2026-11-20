@@ -1,7 +1,7 @@
 /* Données cliniques — PEC VIH pédiatrique Sénégal / OMS */
 window.__ARVP = window.__ARVP || {};
 window.PEC_DATA = {
-  version: "5000.27", // v5000.27 — Affiche intégrée en Base64 WebP pour MAJ OTA 100% hors-ligne
+  version: "5000.28", // v5000.28 — correction libellé TAF en TAF/3TC/DTG
   SI: {
     a: { label: 'Formulation préférentielle', color: '#0d2f7a', bg: '#b8cef8', border: '#3a6ad4' },
     b: { label: 'Formulation optionnelle 1', color: '#1a4aaa', bg: '#ccdaf8', border: '#5a88d8' },
@@ -67,7 +67,7 @@ window.PEC_DATA = {
       img: 'icons/ALD_bottle.png',
       tranches: [null, null, null, null, null, { pu: '1 cp', schema: 'a', heure: 'matin' }, { pu: '1 cp', schema: 'c', heure: 'matin' }],
     },
-    { nom: 'TAF', img: 'icons/TAF_bottle.png', tranches: [null, null, null, null, null, null, { pu: '1 cp', schema: 'a', heure: 'matin' }] },
+    { nom: 'TAF/3TC/DTG', img: 'icons/TAF_bottle.png', tranches: [null, null, null, null, null, null, { pu: '1 cp', schema: 'a', heure: 'matin' }] },
     { nom: 'TLD (TDF+3TC+DTG)', img: 'icons/TLD_bottle.png', tranches: [null, null, null, null, null, null, { pu: '1 cp', schema: 'b', heure: 'matin' }] },
   ],
 
@@ -88,7 +88,7 @@ window.PEC_DATA = {
     { pref: 'pALD (ABC/3TC/DTG) 60/30/5 : 5 cp (prise unique /j)', opts: ['ABC+3TC 120/60 mg : 1 cp matin + 1+1/2 cp soir\n+ DTG 10 mg : 2+1/2 cp (prise unique /j)'] },
     { pref: 'ABC+3TC 120/60 mg : 3 cp (prise unique /j)\n+ DTG 50 mg : 1 cp (prise unique /j)', opts: ['pALD (ABC/3TC/DTG) 60/30/5 : 6 cp (prise unique /j)'] },
     { pref: 'ALD (ABC/3TC/DTG) 600/300/50 : 1 cp (prise unique /j)', opts: ['ABC+3TC 600/300 mg : 1 cp/j + DTG 50 mg : 1 cp/j'] },
-    { pref: 'TAF : 1 cp (prise unique /j)', opts: ['TLD (TDF+3TC+DTG) : 1 cp (prise unique /j)', 'ALD (ABC/3TC/DTG) 600/300/50 : 1 cp (prise unique /j)', 'ABC+3TC 600/300 mg : 1 cp/j + DTG 50 mg : 1 cp/j'] },
+    { pref: 'TAF/3TC/DTG : 1 cp (prise unique /j)', opts: ['TLD (TDF+3TC+DTG) : 1 cp (prise unique /j)', 'ALD (ABC/3TC/DTG) 600/300/50 : 1 cp (prise unique /j)', 'ABC+3TC 600/300 mg : 1 cp/j + DTG 50 mg : 1 cp/j'] },
   ],
 
   PC: {
@@ -98,6 +98,7 @@ window.PEC_DATA = {
     'DTG 50 mg': '#ffd600', // Jaune Vif (Label)
     'pALD (ABC/3TC/DTG) 60/30/5': '#fdd835', // Jaune (Label)
     'ALD (ABC/3TC/DTG) 600/300/50': '#9c27b0', // Violet (Label)
+    'TAF/3TC/DTG': '#03a9f4', // Bleu Clair (Label TAF/3TC/DTG)
     TAF: '#03a9f4', // Bleu Clair (Label TAF)
     'TLD (TDF+3TC+DTG)': '#2e7d32', // Vert (Label TLD)
   },
