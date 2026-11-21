@@ -4,6 +4,7 @@
  */
 class MvaPediatricFlowchart extends HTMLElement {
   connectedCallback() {
+    if (this.shadowRoot) return;
     const root = this.attachShadow({ mode: 'open' });
 
     const steps = [
@@ -61,18 +62,36 @@ class MvaPediatricFlowchart extends HTMLElement {
             --gray-title: #F1EFE8;
             --gray-sub: #D3D1C7;
           }
+          .node:focus rect, .node:focus-visible rect { stroke: #82b1ff; }
         }
         .wrap { background: var(--surface); border-radius: 12px; padding: 8px; }
+        .fc-hint { font-size: 11px; color: var(--text-secondary); margin: 0 0 6px; line-height: 1.35; }
+        .fc-chart { cursor: zoom-in; border-radius: 10px; }
+        .fc-expand {
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          width: 100%; min-height: 44px; margin-top: 8px; padding: 8px 12px;
+          border: 1px solid var(--border); border-radius: 10px;
+          background: var(--surface); color: var(--text-primary);
+          font-size: 13px; font-weight: 600; cursor: pointer;
+        }
+        .fc-expand:hover { filter: brightness(0.96); }
+        .fc-expand:focus-visible { outline: 2px solid #0d47a1; outline-offset: 2px; }
+        .fc-icon { font-size: 16px; line-height: 1; }
         svg { display: block; width: 100%; height: auto; }
         .node { cursor: pointer; }
         .node:hover rect { filter: brightness(0.96); }
+        .node:focus { outline: none; }
+        .node:focus rect, .node:focus-visible rect { stroke: #0d47a1; stroke-width: 3; }
         .node text { pointer-events: none; }
         .th { font-size: 14px; font-weight: 600; }
         .ts { font-size: 12px; font-weight: 400; }
         .arr { stroke: var(--text-secondary); stroke-width: 1.5; fill: none; }
       </style>
       <div class="wrap">
-        <svg viewBox="0 0 680 750" role="img" aria-label="Organigramme de prise en charge du VIH chez l'enfant, avec branche maladie VIH avancée">
+        <p class="fc-hint" id="mva-fc-hint">Touchez l'organigramme ou le bouton Plein écran pour l'agrandir.</p>
+        <div class="fc-chart" id="mva-fc-chart">
+          <svg viewBox="0 0 680 750" role="group" aria-labelledby="mva-fc-title" aria-describedby="mva-fc-hint">
+            <title id="mva-fc-title">Organigramme de prise en charge du VIH chez l'enfant, avec branche maladie VIH avancée</title>
           <defs>
             <marker id="arrow-mva" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -151,16 +170,183 @@ class MvaPediatricFlowchart extends HTMLElement {
             <text class="ts" x="340" y="720" text-anchor="middle" dominant-baseline="central" fill="var(--gray-sub)">CV, CD4, observance, transition ado</text>
           </g>
         </svg>
+        </div>
+        <button type="button" class="fc-expand" data-action="expand" aria-label="Afficher l'organigramme en plein écran">
+          <span class="fc-icon" aria-hidden="true">&#9974;</span> Plein écran
+        </button>
       </div>
     `;
 
+    const svg = root.querySelector('svg');
+    const chart = root.querySelector('.fc-chart');
+    const expandBtn = root.querySelector('[data-action="expand"]');
+    const FS_VARS = [
+      '--surface', '--border', '--text-primary', '--text-secondary',
+      '--coral-fill', '--coral-stroke', '--coral-title', '--coral-sub',
+      '--teal-fill', '--teal-stroke', '--teal-title', '--teal-sub',
+      '--gray-fill', '--gray-stroke', '--gray-title', '--gray-sub',
+    ];
+    let overlay = null;
+    let lastFocus = null;
+
+    function closeFullscreen() {
+      if (!overlay) return;
+      overlay.remove();
+      overlay = null;
+      document.removeEventListener('keydown', onOverlayKey);
+      if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+    }
+
+    function onOverlayKey(e) {
+      if (!overlay) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeFullscreen();
+        return;
+      }
+      if (e.key === 'Tab') {
+        const focusables = overlay.querySelectorAll('.mva-fs-close, .mva-fs-scroll');
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    function openFullscreen() {
+      if (overlay) return;
+      lastFocus = root.activeElement || document.activeElement;
+
+      overlay = document.createElement('div');
+      overlay.className = 'mva-fs';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-labelledby', 'mva-fs-title');
+      overlay.setAttribute('aria-describedby', 'mva-fs-hint');
+
+      const cs = getComputedStyle(this);
+      FS_VARS.forEach(function (name) {
+        const value = cs.getPropertyValue(name).trim();
+        if (value) overlay.style.setProperty(name, value);
+      });
+
+      overlay.innerHTML = `
+        <style>
+          .mva-fs {
+            position: fixed; inset: 0; z-index: 3000;
+            display: flex; flex-direction: column;
+            background: var(--surface); color: var(--text-primary);
+            font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+            animation: fadeIn 0.2s ease;
+          }
+          .mva-fs-bar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-bottom: 1px solid var(--border);
+            padding-top: max(10px, env(safe-area-inset-top));
+          }
+          .mva-fs-title {
+            flex: 1; margin: 0; font-size: 14px; font-weight: 700; line-height: 1.3;
+          }
+          .mva-fs-close {
+            flex: none; width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border); background: var(--surface);
+            color: var(--text-primary); font-size: 20px; line-height: 1; cursor: pointer;
+          }
+          .mva-fs-close:focus-visible { outline: 2px solid #0d47a1; outline-offset: 2px; }
+          .mva-fs-hint {
+            margin: 0; padding: 6px 12px 0; font-size: 11px; line-height: 1.35;
+            color: var(--text-secondary);
+          }
+          .mva-fs-scroll {
+            flex: 1; overflow: auto; -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain; padding: 10px 8px max(16px, env(safe-area-inset-bottom));
+            background: var(--surface);
+          }
+          .mva-fs-scroll:focus-visible { outline: 2px solid #0d47a1; outline-offset: -2px; }
+          .mva-fs svg { display: block; width: 680px; width: max(680px, 100%); height: auto; }
+          .mva-fs .node { cursor: default; }
+          .mva-fs .node text { pointer-events: none; }
+          .mva-fs .th { font-size: 14px; font-weight: 600; }
+          .mva-fs .ts { font-size: 12px; font-weight: 400; }
+          .mva-fs .arr { stroke: var(--text-secondary); stroke-width: 1.5; fill: none; }
+        </style>
+        <div class="mva-fs-bar">
+          <h2 class="mva-fs-title" id="mva-fs-title">Organigramme MVA &mdash; VIH chez l'enfant</h2>
+          <button type="button" class="mva-fs-close" aria-label="Fermer le plein écran">&#10005;</button>
+        </div>
+        <p class="mva-fs-hint" id="mva-fs-hint">Faites défiler pour explorer l'organigramme.</p>
+        <div class="mva-fs-scroll" tabindex="0" role="region" aria-label="Organigramme en plein écran"></div>
+      `;
+
+      const clone = svg.cloneNode(true);
+      clone.setAttribute('role', 'img');
+      clone.setAttribute('aria-label', "Organigramme de prise en charge du VIH chez l'enfant");
+      clone.removeAttribute('aria-labelledby');
+      clone.removeAttribute('aria-describedby');
+      clone.querySelectorAll('.node').forEach(function (node) {
+        node.removeAttribute('tabindex');
+        node.removeAttribute('role');
+        node.removeAttribute('aria-label');
+      });
+      clone.querySelectorAll('[id]').forEach(function (el) {
+        el.id = el.id + '-fs';
+      });
+      clone.querySelectorAll('*').forEach(function (el) {
+        Array.prototype.slice.call(el.attributes).forEach(function (attr) {
+          if (attr.value.indexOf('url(#') !== -1) {
+            attr.value = attr.value.replace(/url\(#([^)]+)\)/g, 'url(#$1-fs)');
+          }
+          if (attr.name === 'aria-labelledby' || attr.name === 'aria-describedby') {
+            el.removeAttribute(attr.name);
+          }
+        });
+      });
+
+      overlay.querySelector('.mva-fs-scroll').appendChild(clone);
+      document.body.appendChild(overlay);
+
+      overlay.querySelector('.mva-fs-close').addEventListener('click', closeFullscreen);
+      document.addEventListener('keydown', onOverlayKey);
+      overlay.querySelector('.mva-fs-close').focus();
+
+      const scroller = overlay.querySelector('.mva-fs-scroll');
+      if (scroller) scroller.scrollTop = 0;
+    }
+
+    expandBtn.addEventListener('click', openFullscreen);
+    chart.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('.node')) return;
+      openFullscreen();
+    });
+
+    const activate = (node) => {
+      this.dispatchEvent(new CustomEvent('step-click', {
+        detail: { id: node.dataset.id, title: node.dataset.title },
+        bubbles: true,
+        composed: true,
+      }));
+    };
+
     root.querySelectorAll('.node').forEach((node) => {
-      node.addEventListener('click', () => {
-        this.dispatchEvent(new CustomEvent('step-click', {
-          detail: { id: node.dataset.id, title: node.dataset.title },
-          bubbles: true,
-          composed: true,
-        }));
+      const label = Array.from(node.querySelectorAll('text'))
+        .map((t) => t.textContent.trim())
+        .filter(Boolean)
+        .join(' — ');
+      node.setAttribute('tabindex', '0');
+      node.setAttribute('role', 'button');
+      node.setAttribute('aria-label', label);
+      node.addEventListener('click', () => activate(node));
+      node.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activate(node);
+        }
       });
     });
   }

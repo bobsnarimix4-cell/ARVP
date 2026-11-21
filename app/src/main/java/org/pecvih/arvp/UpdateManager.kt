@@ -88,6 +88,7 @@ object UpdateManager {
 
             lastAppliedVersion = info.version
             lastResult = UpdateResult.APPLIED
+            CryptoManager.clearCache()
             Log.i(TAG, "UPDATE APPLIED: ${info.version}")
             return UpdateResult.APPLIED
         } catch (e: Exception) {
@@ -106,6 +107,7 @@ object UpdateManager {
         lastAppliedVersion = ""
         lastResult = UpdateResult.NO_UPDATE
         lastError = ""
+        CryptoManager.clearCache()
         Log.i(TAG, "Update data cleared")
     }
 

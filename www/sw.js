@@ -1,4 +1,4 @@
-const CACHE = 'pec-vih-v504';
+const CACHE = 'pec-vih-v506';
 const ASSETS = [
   './',
   './index.html',

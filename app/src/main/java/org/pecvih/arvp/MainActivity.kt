@@ -227,7 +227,10 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        runUpdateCheck()
+        lifecycleScope.launch {
+            delay(2000L)
+            runUpdateCheck()
+        }
         startPeriodicCheck()
     }
 

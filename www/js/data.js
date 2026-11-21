@@ -1,7 +1,7 @@
 /* Données cliniques — PEC VIH pédiatrique Sénégal / OMS */
 window.__ARVP = window.__ARVP || {};
 window.PEC_DATA = {
-  version: "5000.28", // v5000.28 — correction libellé TAF en TAF/3TC/DTG
+  version: "5000.30", // v5000.30 — organigramme MVA en plein écran au toucher
   SI: {
     a: { label: 'Formulation préférentielle', color: '#0d2f7a', bg: '#b8cef8', border: '#3a6ad4' },
     b: { label: 'Formulation optionnelle 1', color: '#1a4aaa', bg: '#ccdaf8', border: '#5a88d8' },

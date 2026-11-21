@@ -21,6 +21,19 @@ object CryptoManager {
     @Volatile
     private var cachedKey: ByteArray? = null
 
+    @Volatile
+    private var cachedHtml: String? = null
+    @Volatile
+    private var cachedSourcePath: String? = null
+    @Volatile
+    private var cachedSourceModified: Long = -1L
+
+    fun clearCache() {
+        cachedHtml = null
+        cachedSourcePath = null
+        cachedSourceModified = -1L
+    }
+
     private fun deriveKey(): ByteArray {
         val existing = cachedKey
         if (existing != null) return existing
@@ -32,35 +45,51 @@ object CryptoManager {
 
     fun decrypt(context: Context): String? {
         val internalFile = File(context.filesDir, ENC_FILE)
-        if (!internalFile.exists()) {
-            val assetRaw = readAssetRaw(context) ?: return null
-            return decryptRaw(assetRaw)
+        val sourceFile = if (internalFile.exists()) internalFile else null
+        val sourcePath = sourceFile?.absolutePath ?: "asset://$ENC_FILE"
+        val sourceModified = sourceFile?.lastModified() ?: 0L
+
+        if (cachedHtml != null && cachedSourcePath == sourcePath && cachedSourceModified == sourceModified) {
+            Log.i(TAG, "Returning cached decrypted HTML from memory.")
+            return cachedHtml
         }
 
-        return try {
-            val internalRaw = internalFile.readText(Charsets.UTF_8)
-            val internalHtml = decryptRaw(internalRaw)
-            val assetRaw = readAssetRaw(context)
-            val assetHtml = if (assetRaw != null) decryptRaw(assetRaw) else null
-
-            val internalVersion = extractVersion(internalHtml)
-            val assetVersion = extractVersion(assetHtml)
-
-            Log.i(TAG, "Asset Version: $assetVersion | Internal Version: $internalVersion")
-
-            if (assetHtml != null && assetVersion != null && (internalVersion == null || compareVersions(assetVersion, internalVersion) >= 0)) {
-                Log.i(TAG, "Asset version ($assetVersion) >= Internal ($internalVersion). Purging internal file.")
-                internalFile.delete()
-                assetHtml
-            } else {
-                internalHtml ?: assetHtml
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Decryption failed: ${e.message}")
-            internalFile.delete()
+        val decrypted = if (!internalFile.exists()) {
             val assetRaw = readAssetRaw(context) ?: return null
             decryptRaw(assetRaw)
+        } else {
+            try {
+                val internalRaw = internalFile.readText(Charsets.UTF_8)
+                val internalHtml = decryptRaw(internalRaw)
+                val assetRaw = readAssetRaw(context)
+                val assetHtml = if (assetRaw != null) decryptRaw(assetRaw) else null
+
+                val internalVersion = extractVersion(internalHtml)
+                val assetVersion = extractVersion(assetHtml)
+
+                Log.i(TAG, "Asset Version: $assetVersion | Internal Version: $internalVersion")
+
+                if (assetHtml != null && assetVersion != null && (internalVersion == null || compareVersions(assetVersion, internalVersion) >= 0)) {
+                    Log.i(TAG, "Asset version ($assetVersion) >= Internal ($internalVersion). Purging internal file.")
+                    internalFile.delete()
+                    assetHtml
+                } else {
+                    internalHtml ?: assetHtml
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Decryption failed: ${e.message}")
+                internalFile.delete()
+                val assetRaw = readAssetRaw(context) ?: return null
+                decryptRaw(assetRaw)
+            }
         }
+
+        if (decrypted != null) {
+            cachedHtml = decrypted
+            cachedSourcePath = sourcePath
+            cachedSourceModified = sourceFile?.lastModified() ?: 0L
+        }
+        return decrypted
     }
 
     private fun readAssetRaw(context: Context): String? {
