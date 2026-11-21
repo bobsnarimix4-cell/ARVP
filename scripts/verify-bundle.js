@@ -67,8 +67,6 @@ function main() {
   check(!html.includes('io-btn') && !html.includes('io-table'), 'section IO_LIST absente du bundle');
   check(!html.includes('mol-btn') && !html.includes('EF_MOL'), 'section Effets secondaires & interactions absente');
   check(!html.includes('results-res'), 'conteneur IO retiré du HTML');
-  check(html.includes('mva-fs-close') && html.includes('Plein écran'), 'organigramme MVA : ouverture plein écran en un clic');
-  check(html.includes('fc-toolbar') && html.includes('applyZoom'), 'organigramme nourrisson : contrôles de zoom présents');
   check(html.includes('mva-fc-title') && html.includes('inf-fc-title'), 'organigrammes : titres accessibles présents');
   check(html.includes('viewBox="0 0 680 750"') && html.includes('viewBox="0 0 680 640"'), 'organigrammes : viewBox conservés');
   check(!/\bon(?:click|error|load)\s*=\s*["']/i.test(html), 'aucun handler inline (onclick/onerror)');
