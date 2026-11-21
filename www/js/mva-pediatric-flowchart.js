@@ -51,10 +51,8 @@ class MvaPediatricFlowchart extends HTMLElement {
           }
           .node:focus rect, .node:focus-visible rect { stroke: #82b1ff; }
         }
-        .wrap { background: var(--surface); border-radius: 12px; padding: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .fc-hint { font-size: 11px; color: var(--text-secondary); margin: 0 0 6px; line-height: 1.35; }
-        .fc-chart { border-radius: 10px; }
-        svg { display: block; width: 100%; height: auto; min-width: 680px; }
+        .wrap { background: var(--surface); border-radius: 12px; padding: 8px; }
+        svg { display: block; width: 100%; height: auto; }
         .node { cursor: pointer; }
         .node:hover rect { filter: brightness(0.96); }
         .node:focus { outline: none; }
@@ -65,10 +63,8 @@ class MvaPediatricFlowchart extends HTMLElement {
         .arr { stroke: var(--text-secondary); stroke-width: 1.5; fill: none; }
       </style>
       <div class="wrap">
-        <p class="fc-hint" id="mva-fc-hint">Organigramme interactif de prise en charge MVA.</p>
-        <div class="fc-chart" id="mva-fc-chart">
-          <svg viewBox="0 0 680 750" role="group" aria-labelledby="mva-fc-title" aria-describedby="mva-fc-hint">
-            <title id="mva-fc-title">Organigramme de prise en charge du VIH chez l'enfant, avec branche maladie VIH avancée</title>
+        <svg viewBox="0 0 680 750" role="group" aria-labelledby="mva-fc-title">
+          <title id="mva-fc-title">Organigramme de prise en charge du VIH chez l'enfant, avec branche maladie VIH avancée</title>
           <defs>
             <marker id="arrow-mva" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -147,7 +143,6 @@ class MvaPediatricFlowchart extends HTMLElement {
             <text class="ts" x="340" y="720" text-anchor="middle" dominant-baseline="central" fill="var(--gray-sub)">CV, CD4, observance, transition ado</text>
           </g>
         </svg>
-        </div>
       </div>
     `;
 
