@@ -5,8 +5,8 @@ import androidx.compose.ui.graphics.Color
 // Light Theme Palette
 val NavyBluePrimary = Color(0xFF0D2F7A)
 val EmeraldGreenSecondary = Color(0xFF0E7A4E)
-val LightBackground = Color(0xFFF8F9FA)
-val SurfaceWhite = Color(0xFFFFFFFF)
+val LightBackground = Color(0xFFFDFCFB)
+val SurfaceWhite = Color(0xFFFDFCFB)
 
 // Dark Theme Palette
 val NavyBluePrimaryDark = Color(0xFF8AAEFF)
