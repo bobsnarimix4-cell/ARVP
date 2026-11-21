@@ -1,4 +1,4 @@
-const CACHE = 'pec-vih-v503';
+const CACHE = 'pec-vih-v504';
 const ASSETS = [
   './',
   './index.html',
@@ -13,7 +13,6 @@ const ASSETS = [
   './manifest.json',
   './icons/ARV-P.png',
   './icons/icon-192.png',
-  './icons/signes_appel_vih_pediatrique.webp',
   './icons/icon-512.png',
   './icons/ALD_bottle.png',
   './icons/TAF_bottle.png',
