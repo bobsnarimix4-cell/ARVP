@@ -1,4 +1,3 @@
-@file:Suppress("SpellCheckingInspection")
 package org.pecvih.arvp
 
 import android.annotation.SuppressLint
