@@ -120,6 +120,27 @@ function copyAssetsToWWW() {
   fs.mkdirSync(ghPagesDir, { recursive: true });
   fs.copyFileSync(srcEncFile, ghEncFile);
   console.log('  Copied index.html.enc to gh-pages/ for OTA');
+
+  // Copie de l'application PWA web complète dans gh-pages/ pour accès iPhone (iOS/Safari)
+  const pwaFiles = ['index.html', 'manifest.json', 'sw.js'];
+  for (const f of pwaFiles) {
+    const src = path.join(WWW, f);
+    if (fs.existsSync(src)) {
+      fs.copyFileSync(src, path.join(ghPagesDir, f));
+    }
+  }
+  const pwaDirs = ['css', 'js', 'icons'];
+  for (const d of pwaDirs) {
+    const srcDir = path.join(WWW, d);
+    const dstDir = path.join(ghPagesDir, d);
+    if (fs.existsSync(srcDir)) {
+      fs.mkdirSync(dstDir, { recursive: true });
+      for (const f of fs.readdirSync(srcDir)) {
+        fs.copyFileSync(path.join(srcDir, f), path.join(dstDir, f));
+      }
+    }
+  }
+  console.log('  Copied PWA web app to gh-pages/ for iOS/Safari support');
 }
 
 function main() {
