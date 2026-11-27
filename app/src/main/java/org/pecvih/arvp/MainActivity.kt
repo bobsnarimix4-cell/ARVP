@@ -14,20 +14,24 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.annotation.Keep
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.toColorInt
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.atomic.AtomicBoolean
 import org.pecvih.arvp.ui.theme.ARVPédiatriqueTheme
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class MainActivity : ComponentActivity() {
 
@@ -73,7 +77,7 @@ class MainActivity : ComponentActivity() {
                     isReady.value = true
                 }
                 if (version.isNotEmpty() && wasUpdated) {
-                    webView?.evaluateJavascript(makeToastJS("Mise à jour appliquée — v$version", "#0e7a4e"), null)
+                    webView?.evaluateJavascript(makeToastJS("Mise à jour appliquée — v$version"), null)
                     wasUpdated = false
                 }
             }
@@ -144,15 +148,15 @@ class MainActivity : ComponentActivity() {
 
     private fun startPeriodicCheck() {
         lifecycleScope.launch {
-            delay(60_000L)
+            delay(1.minutes)
             while (true) {
                 runUpdateCheck()
-                delay(CHECK_INTERVAL_MS)
+                delay(CHECK_INTERVAL_MINUTES.minutes)
             }
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -188,16 +192,15 @@ class MainActivity : ComponentActivity() {
                             settings.domStorageEnabled = true
                             settings.allowFileAccess = true
                             settings.cacheMode = WebSettings.LOAD_NO_CACHE
-                            settings.databaseEnabled = true
                             clearCache(true)
-                            setBackgroundColor(android.graphics.Color.parseColor("#fdfcfb"))
+                            setBackgroundColor("#fdfcfb".toColorInt())
 
                             webViewClient = object : WebViewClient() {
                                 override fun onPageFinished(view: WebView?, url: String?) {
                                     super.onPageFinished(view, url)
                                     if (wasUpdated) {
                                         view?.evaluateJavascript(
-                                            makeToastJS("Application mise à jour — v${UpdateManager.lastAppliedVersion}", "#0e7a4e"),
+                                            makeToastJS("Application mise à jour — v${UpdateManager.lastAppliedVersion}"),
                                             null
                                         )
                                         wasUpdated = false
@@ -228,7 +231,7 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            delay(2000L)
+            delay(2.seconds)
             runUpdateCheck()
         }
         startPeriodicCheck()
@@ -244,6 +247,8 @@ class MainActivity : ComponentActivity() {
         webView?.restoreState(savedInstanceState)
     }
 
+    @Keep
+    @Suppress("unused")
     inner class UpdateBridge {
         @JavascriptInterface
         fun checkForUpdate() {
@@ -259,9 +264,9 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         private const val TAG = "ARVP_Main"
-        private const val CHECK_INTERVAL_MS = 5 * 60 * 1000L
+        private const val CHECK_INTERVAL_MINUTES = 5
 
-        private fun makeToastJS(message: String, color: String): String {
+        private fun makeToastJS(message: String, color: String = "#0e7a4e"): String {
             val escaped = message.replace("'", "\\'")
             return """
                 (function(){
